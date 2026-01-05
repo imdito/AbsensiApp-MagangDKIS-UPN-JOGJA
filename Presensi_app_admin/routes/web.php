@@ -1,29 +1,32 @@
 <?php
 
 use App\Http\Controllers\auth\loginController;
+use App\Http\Controllers\userManagement\UserController;
 use App\Models\presensi;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PresensiController;
 
-Route::get('/', [PresensiController::class, 'index'])->name('home')->middleware('auth');
-Route::get('/presensi', [PresensiController::class, 'create'])->name('presensi');
 
-Route::post('/presensi/store', [PresensiController::class, 'store'])->name('presensi.store');
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [loginController::class, 'index'])->name('login');
+    Route::post('/login', [loginController::class, 'authenticate'])->name('login.post');
 
-Route::get('/presensi/edit/{id}', [PresensiController::class, 'edit'])->name('presensi.edit');
+});
 
-Route::put('/presensi/update/{id}', [PresensiController::class, 'update'])->name('presensi.update');
+Route::middleware('auth')->group(function () {
 
-Route::delete('/presensi/delete/{id}', [PresensiController::class, 'destroy'])->name('presensi.delete');
+    Route::get('/', [PresensiController::class, 'index'])->name('home');
+    Route::get('/presensi', [PresensiController::class, 'create'])->name('presensi');
+    Route::post('/presensi/store', [PresensiController::class, 'store'])->name('presensi.store');
+    Route::get('/presensi/edit/{id}', [PresensiController::class, 'edit'])->name('presensi.edit');
+    Route::put('/presensi/update/{id}', [PresensiController::class, 'update'])->name('presensi.update');
+    Route::delete('/presensi/delete/{id}', [PresensiController::class, 'destroy'])->name('presensi.delete');
+    Route::get('/presensi/buatQR', function () {
+        return view('app.buatQR', ['namaKelas'=> 'tes kelas', 'tanggal' => date('Y-m-d'), 'qrData' => 'tes data qr']);
+    })->name('buatQR');
+    Route::post('/logout', [loginController::class, 'logout'])->name('logout');
+    Route::get('/tambah-user', [UserController::class, 'index']);
+    Route::post('tambah-user', [UserController::class, 'store']);
+});
 
-Route::get('/presensi/buatQR', function () {
-    return view('app.buatQR', ['namaKelas'=> 'tes kelas', 'tanggal' => date('Y-m-d'), 'qrData' => 'tes data qr']);
-})->name('buatQR')->middleware('auth');
 
-Route::get('/login', function () {
-    return view('auth.login', [loginController::class, 'index']);
-})->name('login')->middleware('guest');
-
-Route::post('/login', [loginController::class, 'authenticate'])->name('login.post')->middleware('guest');
-
-Route::post('/logout', [loginController::class, 'logout'])->name('logout')->middleware('auth');

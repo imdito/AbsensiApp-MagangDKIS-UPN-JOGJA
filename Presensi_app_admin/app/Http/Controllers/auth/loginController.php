@@ -33,4 +33,31 @@ class loginController extends controller{
         $request->session()->regenerateToken();
         return redirect('/login');
     }
+
+    public function loginAPI(Request $request){
+       $credentials  = $request->validate([
+            'email' => 'required|string',
+            'password' => 'required|string'
+
+        ]);
+
+        if(Auth::attempt($credentials)){
+            $user = Auth::user();
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+            ]);
+        }
+
+        return response()->json(['message' => 'Invalid login credentials'], 401);
+    }
+
+    public function getUserData()
+    {
+
+    }
+
+
 }

@@ -13,7 +13,7 @@ class loginController extends controller{
 
     public function authenticate(Request $request){
         $credentials = $request->validate([
-            'email' => 'required|string|email:dns',
+            'email' => 'required|string',
             'password' => 'required|string'
 
         ]);
@@ -48,16 +48,12 @@ class loginController extends controller{
             return response()->json([
                 'access_token' => $token,
                 'token_type' => 'Bearer',
+                'user' => $user
             ]);
         }
 
         return response()->json(['message' => 'Invalid login credentials'], 401);
     }
-
-    public function getUserData()
-    {
-
-    }
-
+    
 
 }

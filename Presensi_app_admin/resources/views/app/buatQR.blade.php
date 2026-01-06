@@ -11,8 +11,8 @@
 <div class="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md w-full border border-gray-200">
 
     <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">{{ $namaKelas }}</h1>
-        <p class="text-gray-500 mt-1">{{ $tanggal }}</p>
+        <h1 class="text-2xl font-bold text-gray-800">Kode qr Hari ini</h1>
+        <p class="text-gray-500 mt-1">17 Agustus 2026</p>
         <span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full mt-2">
                 Sesi Aktif
             </span>

@@ -52,23 +52,20 @@ class ScanPresensiView extends StatelessWidget {
               final List<Barcode> barcodes = capture.barcodes;
               for (final barcode in barcodes) {
                 // Nanti logika backend ditaruh di sini
-                debugPrint('QR Code ditemukan: ${barcode.rawValue}');
+                controller.onDetect(capture);
               }
             },
           ),
 
           // LAPISAN 2: Overlay Gelap & Kotak Fokus
-          // Kita gunakan ColorFiltered untuk membuat efek "bolong" di tengah
           ColorFiltered(
             colorFilter: ColorFilter.mode(
-              // Warna background gelap transparan (opacity 0.7)
               Colors.black.withOpacity(0.7),
               BlendMode.srcOut,
             ),
             child: Stack(
               fit: StackFit.expand,
               children: [
-                // Background yang akan "dilubangi"
                 Container(
                   decoration: const BoxDecoration(
                     color: Colors.black,

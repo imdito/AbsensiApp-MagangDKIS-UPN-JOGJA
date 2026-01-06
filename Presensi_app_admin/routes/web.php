@@ -26,9 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/presensi/edit/{id}', [PresensiController::class, 'edit'])->name('presensi.edit');
     Route::put('/presensi/update/{id}', [PresensiController::class, 'update'])->name('presensi.update');
     Route::delete('/presensi/delete/{id}', [PresensiController::class, 'destroy'])->name('presensi.delete');
-    Route::get('/presensi/buatQR', function () {
-        return view('app.buatQR', ['namaKelas'=> 'tes kelas', 'tanggal' => date('Y-m-d'), 'qrData' => 'tes data qr']);
-    })->name('buatQR');
+    Route::get('/presensi/generateQR', [PresensiController::class, 'generateQR'])->name('presensi.generateQR');
 
     //User Management
     Route::get('/tambah-user', [UserController::class, 'index']);

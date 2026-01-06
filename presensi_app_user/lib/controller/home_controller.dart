@@ -1,18 +1,18 @@
 import 'package:get/get.dart';
+import 'package:presensi_app_user/model/user_model.dart';
+import 'package:presensi_app_user/view/scan_presensi_view.dart';
 
 class HomeController extends GetxController {
-  // Data User Dummy (Nanti diambil dari API/Storage)
-  var userName = "Pandito Setiawan".obs;
-  var userDivision = "Mobile Developer".obs;
 
-  // Data Presensi Hari Ini (Dummy)
-  var jamMasuk = "07:45".obs;
-  var jamPulang = "--:--".obs;
+  UserModel user = Get.arguments['user'];
+
+  var jamMasuk = '08:00 AM'.obs;
+  var jamPulang = '05:00 PM'.obs;
 
   // Navigasi
   void goToPresensi() {
     print("Navigasi ke Halaman Presensi/Scan QR");
-    // Get.to(() => PresensiPage());
+    Get.to(() => ScanPresensiView(), arguments: user.id);
   }
 
   void goToEditProfile() {

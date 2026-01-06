@@ -2,8 +2,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\presensi;
+use App\Models\QrToken;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PresensiController extends Controller{
     public function index(){
@@ -70,5 +73,44 @@ class PresensiController extends Controller{
     {
         presensi::where('id', $id)->delete();
         return redirect('/');
+    }
+
+    public function generateQR(){
+        $token = Str::random(32);
+        $qr = QrToken::create([
+            'token' => $token,
+            'expires_at' => Carbon::now()->addHours(24),
+        ]);
+
+        return view('app.buatQR', ['qrData' => $qr['token']]);
+    }
+
+    public function storeViaQR(Request $request){
+        $request ->validate([
+           'qr_token' => 'required',
+            'user_id' => 'required',
+
+        ]);
+
+        $validasiToken =QrToken::where('token', $request->qr_token)
+            ->where('expires_at', '>=', Carbon::now() )->first();
+
+        if(!$validasiToken){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'QR Code sudah kadaluwarsa atau tidak valid. Silakan scan ulang QR terbaru.'
+            ]);
+        }
+        presensi::create([
+           'user_id' => $request->user_id,
+            'tanggal' => $request->tanggal,
+            'status' => $request->status,
+            'jam_masuk' => $request->jam_masuk,
+            'jam_pulang' => $request->jam_pulang,
+        ]);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Presensi berhasil dicatat!'
+        ],200);
     }
 }

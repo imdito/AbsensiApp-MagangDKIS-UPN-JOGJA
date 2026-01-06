@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../controller/home_controller.dart';
-
-// Import Controller jika dipisah file, kalau satu file abaikan import ini
-// import 'home_controller.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -14,7 +10,6 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     //  Controller
     final HomeController controller = Get.put(HomeController());
-
     // Warna Tema
     const Color primaryColor = Color(0xFF4F46E5); // Indigo 600
     const Color secondaryColor = Color(0xFFEEF2FF); // Indigo 50
@@ -53,21 +48,21 @@ class HomePage extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          Obx(() => Text(
-                            controller.userName.value,
+                          Text(
+                            controller.user.nama,
                             style: GoogleFonts.inter(
                               color: Colors.white,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
-                          )),
-                          Obx(() => Text(
-                            controller.userDivision.value,
+                          ),
+                          Text(
+                            controller.user.divisi,
                             style: GoogleFonts.inter(
                               color: Colors.indigo.shade200,
                               fontSize: 12,
                             ),
-                          )),
+                          )
                         ],
                       ),
                       // Logout Icon Button

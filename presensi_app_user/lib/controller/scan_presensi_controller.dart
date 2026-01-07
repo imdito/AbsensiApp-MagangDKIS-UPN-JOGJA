@@ -71,9 +71,6 @@ class ScanPresensiController extends GetxController {
         margin: const EdgeInsets.all(10),
       );
 
-      // Balik ke halaman Home setelah sukses
-      Get.back();
-
     } catch (e) {
       // Tutup Loading jika error
       Get.back();

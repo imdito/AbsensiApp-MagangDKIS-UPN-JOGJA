@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../model/user_model.dart';
+import '../../view/auth/login_page.dart';
 import '../../view/home_page.dart';
 import '../../view/scan_presensi_view.dart';
 
@@ -26,7 +27,6 @@ class LoginController extends GetxController {
     isObscure.value = !isObscure.value;
   }
 
-  // Fungsi Login (Placeholder)
   // Fungsi Login
   Future<void> login() async {
     try {
@@ -50,7 +50,7 @@ class LoginController extends GetxController {
         // Simpan ke memory
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', newToken);
-
+        await prefs.setString('user_data', jsonEncode(userjson));
         // Update state token
         token.value = newToken;
 

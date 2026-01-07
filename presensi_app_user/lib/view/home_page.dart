@@ -41,7 +41,7 @@ class HomePage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Halo, Selamat Pagi',
+                            'Halo, Selamat ${controller.statusHari()}',
                             style: GoogleFonts.inter(
                               color: Colors.white70,
                               fontSize: 14,

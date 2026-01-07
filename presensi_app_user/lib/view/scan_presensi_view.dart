@@ -49,11 +49,8 @@ class ScanPresensiView extends StatelessWidget {
           MobileScanner(
             controller: cameraController,
             onDetect: (capture) {
-              final List<Barcode> barcodes = capture.barcodes;
-              for (final barcode in barcodes) {
-                // Nanti logika backend ditaruh di sini
-                controller.onDetect(capture);
-              }
+              controller.onDetect(capture);
+              Get.back();
             },
           ),
 

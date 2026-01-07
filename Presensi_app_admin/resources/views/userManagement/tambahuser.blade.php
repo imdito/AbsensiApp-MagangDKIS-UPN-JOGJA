@@ -51,9 +51,9 @@
             @csrf
 
             <div>
-                <label for="nama" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
+                <label for="Nama_Pengguna" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
                 <div class="mt-1">
-                    <input type="text" name="nama" id="nama" value="{{ old('nama') }}" required placeholder="Contoh: Budi Santoso"
+                    <input type="text" name="Nama_Pengguna" id="Nama_Pengguna" value="{{ old('Nama_Pengguna') }}" required placeholder="Contoh: Budi Santoso"
                            class="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-200">
                 </div>
             </div>
@@ -61,17 +61,17 @@
             <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
 
                 <div>
-                    <label for="nip" class="block text-sm font-medium text-gray-700">NIP (Nomor Induk)</label>
+                    <label for="NIP" class="block text-sm font-medium text-gray-700">NIP (Nomor Induk)</label>
                     <div class="mt-1">
-                        <input type="number" name="nip" id="nip" value="{{ old('nip') }}" required placeholder="12345678"
+                        <input type="number" name="NIP" id="NIP" value="{{ old('nip') }}" required placeholder="12345678"
                                class="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                     </div>
                 </div>
 
                 <div>
-                    <label for="divisi" class="block text-sm font-medium text-gray-700">Divisi / Jabatan</label>
+                    <label for="Id_Divisi" class="block text-sm font-medium text-gray-700">Divisi / Jabatan</label>
                     <div class="mt-1">
-                        <input type="text" name="divisi" id="divisi" value="{{ old('divisi') }}" required placeholder="IT Support"
+                        <input type="text" name="Id_Divisi" id="Id_Divisi" value="{{ old('Id_Divisi') }}" required placeholder="IT Support"
                                class="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                     </div>
                 </div>

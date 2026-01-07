@@ -50,7 +50,7 @@
             <p class="text-gray-500 text-sm mt-2">Silakan masuk menggunakan akun Anda</p>
         </div>
 
-        <form action="{{ url('/login') }}" method="POST" class="space-y-6">
+        <form action="{{ route('login.post') }}" method="POST" class="space-y-6">
             @csrf
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Alamat Email</label>

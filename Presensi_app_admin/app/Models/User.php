@@ -23,11 +23,11 @@ class User extends Authenticatable
 
     protected $primaryKey = 'user_id'; // mengubah default primary key dari id menjadi user_id
     protected $fillable = [
-        'nama',
+        'Nama_Pengguna',
         'email',
         'password',
-        'nip',
-        'divisi'
+        'NIP',
+        'Id_Divisi',
     ];
 
     /**
@@ -40,7 +40,6 @@ class User extends Authenticatable
         //'remember_token',
     ];
 
-    public $timestamps = false; // tabel tidak ada created_at
     /**
      * Get the attributes that should be cast.
      *
@@ -50,7 +49,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'Password' => 'hashed',
         ];
     }
 

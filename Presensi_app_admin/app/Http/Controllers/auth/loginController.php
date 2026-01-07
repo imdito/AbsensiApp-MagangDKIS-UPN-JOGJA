@@ -12,17 +12,17 @@ class loginController extends controller{
     }
 
     public function authenticate(Request $request){
+
         $credentials = $request->validate([
             'email' => 'required|string',
             'password' => 'required|string'
 
         ]);
-
         if(Auth::attempt($credentials)){
             $request->session()->regenerate();
             return redirect()->intended('/');
         }
-        return back()->with('loginError', 'Login failed!');
+        return back()->with('message', 'Login failed!');
 
 
     }
@@ -54,6 +54,6 @@ class loginController extends controller{
 
         return response()->json(['message' => 'Invalid login credentials'], 401);
     }
-    
+
 
 }

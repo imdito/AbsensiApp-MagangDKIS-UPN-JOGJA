@@ -76,6 +76,7 @@ class PresensiController extends Controller{
     }
 
     public function generateQR(){
+
         $token = Str::random(32);
         $qr = QrToken::create([
             'token' => $token,

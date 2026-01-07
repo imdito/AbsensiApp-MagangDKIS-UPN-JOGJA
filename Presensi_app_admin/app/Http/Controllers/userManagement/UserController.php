@@ -15,20 +15,20 @@ class UserController extends Controller
 
     public function store(Request $request){
         $request->validate([
-            'nama' => 'required',
+            'Nama_Pengguna' => 'required',
             'email' => 'required',
             'password' => 'required',
-            'nip' => 'required',
-            'divisi' => 'required',
+            'NIP' => 'required',
+            'Id_Divisi' => 'required',
 
         ]);
 
         $data = [
-            'nama' => $request->input('nama'),
+            'Nama_Pengguna' => $request->input('Nama_Pengguna'),
             'email' => $request->input('email'),
             'password' => bcrypt($request->input('password')),
-            'nip' => $request->input('nip'),
-            'divisi' => $request->input('divisi'),
+            'NIP' => $request->input('NIP'),
+            'Id_Divisi' => $request->input('Id_Divisi'),
         ];
         User::create($data);
         return redirect('/karyawan')->with('sukses','Data berhasil ditambahkan');
@@ -42,7 +42,7 @@ class UserController extends Controller
 
     public function update(Request $request, $id){
         $request->validate([
-            'nama' => 'required',
+            'Nama_Pengguna' => 'required',
             'email' => 'required',
             'password' => 'required',
             'nip' => 'required',
@@ -50,11 +50,11 @@ class UserController extends Controller
         ]);
 
         $data = [
-            'nama' => $request->input('nama'),
+            'Nama_Pengguna' => $request->input('Nama_Pengguna'),
             'email' => $request->input('email'),
             'password' => bcrypt($request->input('password')),
-            'nip' => $request->input('nip'),
-            'divisi' => $request->input('divisi'),
+            'nip' => $request->input('NIP'),
+            'divisi' => $request->input('Id_Divisi'),
         ];
         User::where('user_id', $id)->update($data);
         return redirect('/karyawan')->with('sukses', 'Data berhasil diupdate');

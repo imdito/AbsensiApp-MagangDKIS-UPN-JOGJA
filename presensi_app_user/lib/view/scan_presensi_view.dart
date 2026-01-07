@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../controller/scan_presensi_controller.dart';
+import '../utils/notif_presensi.dart';
 
 class ScanPresensiView extends StatelessWidget {
   const ScanPresensiView({super.key});
@@ -50,6 +51,7 @@ class ScanPresensiView extends StatelessWidget {
             controller: cameraController,
             onDetect: (capture) {
               controller.onDetect(capture);
+              showFloatingNotif(context, "Presensi berhasil dicatat!", true);
               Get.back();
             },
           ),

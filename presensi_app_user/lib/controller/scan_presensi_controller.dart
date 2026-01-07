@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../utils/notif_presensi.dart';
+
 class ScanPresensiController extends GetxController {
   final MobileScannerController cameraController = MobileScannerController();
   var idUser = Get.arguments;
@@ -61,29 +63,30 @@ class ScanPresensiController extends GetxController {
       // Tutup Loading
       Get.back();
 
+
       // Tampilkan Sukses
-      Get.snackbar(
-        "Berhasil",
-        "Presensi tercatat untuk kode: $qrCode",
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-        margin: const EdgeInsets.all(10),
-      );
+      // Get.snackbar(
+      //   "Berhasil",
+      //   "Presensi tercatat untuk kode: $qrCode",
+      //   backgroundColor: Colors.green,
+      //   colorText: Colors.white,
+      //   snackPosition: SnackPosition.BOTTOM,
+      //   margin: const EdgeInsets.all(10),
+      // );
 
     } catch (e) {
       // Tutup Loading jika error
       Get.back();
 
       // Tampilkan Error
-      Get.snackbar(
-        "Gagal",
-        e.toString(),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-        margin: const EdgeInsets.all(10),
-      );
+      // Get.snackbar(
+      //   "Gagal",
+      //   e.toString(),
+      //   backgroundColor: Colors.red,
+      //   colorText: Colors.white,
+      //   snackPosition: SnackPosition.BOTTOM,
+      //   margin: const EdgeInsets.all(10),
+      // );
 
       // Reset agar user bisa mencoba scan lagi segera
       isScanning.value = false;

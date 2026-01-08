@@ -48,7 +48,14 @@ class loginController extends controller{
             return response()->json([
                 'access_token' => $token,
                 'token_type' => 'Bearer',
-                'user' => $user
+                'user' => [
+                    'user_id' => $user->user_id,
+                    'nama' => $user->Nama_Pengguna,
+                    'email' => $user->email,
+                    'divisi' => $user->divisi->Nama_Divisi,
+                    'NIP' => $user->NIP,
+
+                ]
             ]);
         }
 

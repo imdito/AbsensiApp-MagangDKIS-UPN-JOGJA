@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\PresensiStatus;
+use App\Enums\Enums;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,23 +11,19 @@ class presensi extends Model
     use hasfactory;
     protected $table = 'presensi';
     public $timestamps = false;
-    protected $attributes = [
-        'jam_masuk' => '00:00:00',
-        'jam_pulang' => '00:00:00',
-    ];
 
     protected $casts = [
-        'status' => PresensiStatus::class,
+        'status' => Enums::class,
     ];
     protected $fillable = [
       'user_id',
-        'id_QR',
+        'Id_QR',
         'status',
       'tanggal',
       'jam_masuk',
         'jam_pulang',
-        'longitude',
-        'latitude',
+        'Longitude',
+        'Latitude',
       'created_at'
     ];
 

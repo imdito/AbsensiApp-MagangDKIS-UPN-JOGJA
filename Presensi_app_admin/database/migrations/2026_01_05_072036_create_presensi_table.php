@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('presensi', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('Id_QR');
-            $table->unsignedBigInteger('user_id')->unique();
+            $table->unsignedBigInteger('user_id');
             $table->date('tanggal');
             $table->time('jam_masuk');
             $table->time('jam_pulang');

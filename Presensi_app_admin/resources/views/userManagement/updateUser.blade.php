@@ -54,8 +54,8 @@
             <div>
                 <label for="nama" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
                 <div class="mt-1">
-                    <input type="text" name="nama" id="nama"
-                           value="{{ old('nama', $user->nama) }}" required
+                    <input type="text" name="Nama_Pengguna" id="nama"
+                           value="{{ old('nama', $user->Nama_Pengguna) }}" required
                            class="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-200">
                 </div>
             </div>
@@ -71,11 +71,22 @@
                 </div>
 
                 <div>
-                    <label for="divisi" class="block text-sm font-medium text-gray-700">Divisi</label>
+                    <label for="Id_Divisi" class="block text-sm font-medium text-gray-700">Divisi</label>
                     <div class="mt-1">
-                        <input type="text" name="divisi" id="divisi"
-                               value="{{ old('divisi', $user->divisi) }}" required
-                               class="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <select name="Id_Divisi" id="Id_Divisi" required
+                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white">
+
+                            <option value="" disabled>-- Pilih Divisi --</option>
+
+                            @foreach($daftar_divisi as $item)
+                                <option value="{{ $item->Id_Divisi }}"
+                                    {{ old('Id_Divisi', $user->Id_Divisi) == $item->Id_Divisi ? 'selected' : '' }}>
+
+                                    {{ $item->Nama_Divisi }}
+                                </option>
+                            @endforeach
+
+                        </select>
                     </div>
                 </div>
             </div>

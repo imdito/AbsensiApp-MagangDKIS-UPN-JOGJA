@@ -1,12 +1,14 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Enums\Tipe_QR;
 use App\Models\presensi;
 use App\Models\QrToken;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use mysql_xdevapi\Exception;
 
 class PresensiController extends Controller{
     public function index(){
@@ -29,7 +31,7 @@ class PresensiController extends Controller{
     public function store(Request $request){
         $request->validate([
             'tanggal' => 'required|date',
-            'status' => 'required|string',
+            'status' => 'required|in:Hadir,Izin,Tidak Hadir',
         ]);
 
         $data = [
@@ -39,8 +41,11 @@ class PresensiController extends Controller{
             'jam_masuk' => $request->input('jam_masuk'),
             'jam_pulang' => $request->input('jam_pulang'),
             'created_at' => now(),
+            'Id_QR' => 1,
+            'Longitude' => null,
+            'Latitude' => null,
         ];
-        presensi::create($data);
+        Presensi::create($data);
         return redirect('/');
     }
 
@@ -58,11 +63,14 @@ class PresensiController extends Controller{
         ]);
 
         $data = [
+            'Id_QR' => $request->input('Id_QR'),
             'user_id' => $request->input('user_id'),
             'tanggal' => $request->input('tanggal'),
             'status' => $request->input('status'),
             'jam_masuk' => $request->input('jam_masuk'),
             'jam_pulang' => $request->input('jam_pulang'),
+            'Longitude' => $request->input('Longitude'),
+            'Latitude' => $request->input('Latitude'),
         ];
 
         Presensi::where('id', $id)->update($data);
@@ -75,40 +83,54 @@ class PresensiController extends Controller{
         return redirect('/');
     }
 
-    public function generateQR(){
-
-        $token = Str::random(32);
-        $qr = QrToken::create([
-            'token' => $token,
-            'expires_at' => Carbon::now()->addHours(24),
-        ]);
-
-        return view('app.buatQR', ['qrData' => $qr['token']]);
-    }
-
     public function storeViaQR(Request $request){
         $request ->validate([
            'qr_token' => 'required',
             'user_id' => 'required',
-
+            'tanggal' => 'required|date',
+            'status' => 'required|in:Hadir,Izin,Tidak Hadir',
+            'jam_absen' => 'required',
+            'Latitude' => 'required',
+            'Longitude' => 'required',
         ]);
 
         $validasiToken =QrToken::where('token', $request->qr_token)
-            ->where('expires_at', '>=', Carbon::now() )->first();
+            ->where('Expired_at', '>=', Carbon::now()->toDateTimeString() )->first();
 
         if(!$validasiToken){
             return response()->json([
                 'status' => 'error',
                 'message' => 'QR Code sudah kadaluwarsa atau tidak valid. Silakan scan ulang QR terbaru.'
-            ]);
+            ],500);
         }
-        presensi::create([
-           'user_id' => $request->user_id,
-            'tanggal' => $request->tanggal,
-            'status' => $request->status,
-            'jam_masuk' => $request->jam_masuk,
-            'jam_pulang' => $request->jam_pulang,
-        ]);
+
+        try {
+            $tipeAbsen = '';
+            if($validasiToken->Tipe_QR == Tipe_QR::QR_Pulang){
+                $tipeAbsen = 'jam_pulang';
+
+            }else if ($validasiToken->Tipe_QR == Tipe_QR::QR_Masuk){
+                $tipeAbsen = 'jam_masuk';
+            }
+                presensi::create([
+                    'Id_QR' => $validasiToken->Id_QR,
+                    'user_id' => $request->user_id,
+                    'tanggal' => $request->tanggal,
+                    'status' => $request->status,
+                    $tipeAbsen => $request->jam_absen,
+                    'Longitude' => $request->Longitude,
+                    'Latitude' => $request->Latitude,
+                    'created_at' => now(),
+                ]);
+        }catch (Exception $e){
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat mencatat presensi. Silakan coba lagi.',
+                'Error: ' => $e->getMessage()
+            ],500);
+        }
+
         return response()->json([
             'status' => 'success',
             'message' => 'Presensi berhasil dicatat!'

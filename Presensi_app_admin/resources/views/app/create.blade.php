@@ -58,7 +58,7 @@
                         <option value="" disabled {{ old('user_id') ? '' : 'selected' }}>-- Pilih Karyawan --</option>
                         @foreach($users as $user)
                             <option value="{{ $user->user_id }}" {{ old('user_id') == $user->user_id ? 'selected' : '' }}>
-                                {{ $user->nama }} - {{ $user->divisi }}
+                                {{ $user->Nama_Pengguna }} - {{ $user->divisi->Nama_Divisi }}
                             </option>
                         @endforeach
                     </select>

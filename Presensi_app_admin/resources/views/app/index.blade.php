@@ -64,9 +64,13 @@
             </p>
         </div>
         <div class="mt-4 flex flex-col md:flex-row gap-3 md:mt-0 md:ml-4">
-            <a href="{{ route('presensi.generateQR')}}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all">
+            <a href="{{ url('/presensi/generateQR/QR_Masuk') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all">
                 <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-                Buat QR Code
+                Lihat QR Code Masuk
+            </a>
+            <a href="{{ url('/presensi/generateQR/QR_Pulang') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all">
+                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                Lihat QR Code Pulang
             </a>
             <a href="{{ route('presensi') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all">
                 <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -100,12 +104,12 @@
                             <div class="flex items-center">
                                 <div class="h-10 w-10 flex-shrink-0 bg-indigo-100 rounded-full flex items-center justify-center">
                                         <span class="text-indigo-700 font-bold text-sm">
-                                            {{ substr($item->user->nama ?? 'U', 0, 1) }}
+                                            {{ substr($item->user->Nama_Pengguna ?? 'U', 0, 1) }}
                                         </span>
                                 </div>
                                 <div class="ml-4">
                                     <div class="text-sm font-medium text-gray-900">
-                                        {{ $item->user->nama ?? 'User Terhapus' }}
+                                        {{ $item->user->Nama_Pengguna ?? 'User Terhapus' }}
                                     </div>
                                     <div class="text-sm text-gray-500">
                                         {{ $item->user->email ?? '-' }}
@@ -116,7 +120,7 @@
 
                         <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                    {{ $item->user->divisi ?? '-' }}
+                                    {{ $item->user->divisi->Nama_Divisi ?? '-' }}
                                 </span>
                         </td>
 
@@ -126,8 +130,11 @@
 
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             <div class="flex flex-col">
-                                <span class="text-green-600 font-medium">In: {{ $item->jam_masuk }}</span>
-                                <span class="text-red-500 text-xs">Out: {{ $item->jam_pulang ?? '--:--' }}</span>
+                                @if($item->jam_masuk != null)
+                                <span class="text-green-600 font-medium">In: {{ $item->jam_masuk ?? '--:--' }}</span>
+                                @else
+                                <span class="text-red-500 font-medium">Out: {{ $item->jam_pulang ?? '--:--' }}</span>
+                                @endif
                             </div>
                         </td>
 

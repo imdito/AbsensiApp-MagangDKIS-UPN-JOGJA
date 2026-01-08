@@ -3,7 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +23,11 @@ class User extends Authenticatable
      * @var list<string>
      */
 
+    protected function serializeDate(DateTimeInterface $date) // <--- 2. Tambahkan fungsi ini
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
+
     protected $primaryKey = 'user_id'; // mengubah default primary key dari id menjadi user_id
     protected $fillable = [
         'Nama_Pengguna',
@@ -28,6 +35,7 @@ class User extends Authenticatable
         'password',
         'NIP',
         'Id_Divisi',
+        'updated_at',
     ];
 
     /**
@@ -55,5 +63,10 @@ class User extends Authenticatable
 
     public function presensi(){
         return $this->hasMany(presensi::class, 'user_id', 'user_id');
+    }
+
+    public function divisi(): BelongsTo
+    {
+        return $this->belongsTo(Divisi::class, 'Id_Divisi', 'Id_Divisi');
     }
 }

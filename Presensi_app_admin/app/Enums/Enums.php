@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum PresensiStatus: string {
+enum Enums: string {
     case Hadir = 'Hadir';
     case Izin = 'Izin';
     case TidakHadir = 'Tidak Hadir';

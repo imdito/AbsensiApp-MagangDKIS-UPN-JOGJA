@@ -70,10 +70,19 @@
 
                 <div>
                     <label for="Id_Divisi" class="block text-sm font-medium text-gray-700">Divisi / Jabatan</label>
-                    <div class="mt-1">
-                        <input type="text" name="Id_Divisi" id="Id_Divisi" value="{{ old('Id_Divisi') }}" required placeholder="IT Support"
-                               class="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                    </div>
+                    <select name="Id_Divisi" id="Id_Divisi" required
+                            class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white">
+
+                        <option value="" disabled>-- Pilih Divisi --</option>
+
+                        @foreach($daftar_divisi as $item)
+                            <option value="{{ $item->Id_Divisi }}">
+
+                                {{ $item->Nama_Divisi }}
+                            </option>
+                        @endforeach
+
+                    </select>
                 </div>
             </div>
 

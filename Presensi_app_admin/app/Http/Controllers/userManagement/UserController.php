@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\userManagement;
 
 use App\Http\Controllers\Controller;
+use App\Models\Divisi;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
     public function index(){
-
-        return view('userManagement.tambahuser');
+        $daftar_divisi = Divisi::all();
+        return view('userManagement.tambahuser', ['daftar_divisi' => $daftar_divisi]);
     }
 
     public function store(Request $request){
@@ -44,18 +46,23 @@ class UserController extends Controller
         $request->validate([
             'Nama_Pengguna' => 'required',
             'email' => 'required',
-            'password' => 'required',
             'nip' => 'required',
-            'divisi' => 'required',
+            'Id_Divisi' => 'required',
+            'password'  => 'nullable',
         ]);
 
         $data = [
             'Nama_Pengguna' => $request->input('Nama_Pengguna'),
             'email' => $request->input('email'),
-            'password' => bcrypt($request->input('password')),
-            'nip' => $request->input('NIP'),
-            'divisi' => $request->input('Id_Divisi'),
+            'NIP' => $request->input('nip'),
+            'Id_Divisi' => $request->input('Id_Divisi'),
+            'updated_at' => now()->toDateTimeString(),
         ];
+
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
         User::where('user_id', $id)->update($data);
         return redirect('/karyawan')->with('sukses', 'Data berhasil diupdate');
 
@@ -68,7 +75,8 @@ class UserController extends Controller
 
     public function editPage($id){
         $user = User::find($id);
-        return view('userManagement.updateUser', ['user' => $user]);
+        $daftar_divisi = Divisi::all();
+        return view('userManagement.updateUser', ['user' => $user, 'daftar_divisi' => $daftar_divisi]);
     }
 
 }

@@ -68,10 +68,10 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="h-10 w-10 flex-shrink-0 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">
-                                    {{ substr($user->nama, 0, 1) }}
+                                    {{ substr($user->Nama_Pengguna, 0, 1) }}
                                 </div>
                                 <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">{{ $user->nama }}</div>
+                                    <div class="text-sm font-medium text-gray-900">{{ $user->Nama_Pengguna }}</div>
                                     <div class="text-sm text-gray-500">{{ $user->email }}</div>
                                 </div>
                             </div>
@@ -81,7 +81,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">
-                                    {{ $user->divisi ?? 'Staff' }}
+                                    {{ $user->divisi->Nama_Divisi ?? 'Staff' }}
                                 </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

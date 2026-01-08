@@ -6,11 +6,8 @@ import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../model/user_model.dart';
-import '../../view/auth/login_page.dart';
 import '../../view/home_page.dart';
-import '../../view/scan_presensi_view.dart';
 
 class LoginController extends GetxController {
 // Reactive variable (.obs) untuk visibility password
@@ -36,14 +33,17 @@ class LoginController extends GetxController {
       var response = await http.post(
         Uri.parse('$baseUrl/api/login'),
         headers: {'Accept': 'application/json'},
-        body: {'email': email, 'password': password},
+        body: {
+          'email': email,
+          'password': password
+        },
       );
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         var newToken = data['access_token'];
         var userjson = data['user'];
-
+        print("data : $data" );
         //mengubah userjson menjadi usermodel
         UserModel user = UserModel.fromJson(userjson);
 

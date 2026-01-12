@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\userManagement;
 
 use App\Http\Controllers\Controller;
-use App\Models\Divisi;
+use App\Models\Bidang;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
     public function index(){
-        $daftar_divisi = Divisi::all();
+        $daftar_divisi = Bidang::all();
         return view('userManagement.tambahuser', ['daftar_divisi' => $daftar_divisi]);
     }
 
@@ -21,8 +21,7 @@ class UserController extends Controller
             'email' => 'required',
             'password' => 'required',
             'NIP' => 'required',
-            'Id_Divisi' => 'required',
-
+            'id_bidang' => 'required',
         ]);
 
         $data = [
@@ -30,7 +29,7 @@ class UserController extends Controller
             'email' => $request->input('email'),
             'password' => bcrypt($request->input('password')),
             'NIP' => $request->input('NIP'),
-            'Id_Divisi' => $request->input('Id_Divisi'),
+            'id_bidang' => $request->input('id_bidang'),
         ];
         User::create($data);
         return redirect('/karyawan')->with('sukses','Data berhasil ditambahkan');
@@ -38,7 +37,7 @@ class UserController extends Controller
 
     public function listUsers()
     {
-        $karyawan = User::all();
+        $karyawan = User::lazy();
         return view('userManagement.indexUser', ['karyawan' => $karyawan]);
     }
 
@@ -47,7 +46,7 @@ class UserController extends Controller
             'Nama_Pengguna' => 'required',
             'email' => 'required',
             'nip' => 'required',
-            'Id_Divisi' => 'required',
+            'id_bidang' => 'required',
             'password'  => 'nullable',
         ]);
 
@@ -55,7 +54,7 @@ class UserController extends Controller
             'Nama_Pengguna' => $request->input('Nama_Pengguna'),
             'email' => $request->input('email'),
             'NIP' => $request->input('nip'),
-            'Id_Divisi' => $request->input('Id_Divisi'),
+            'id_bidang' => $request->input('id_bidang'),
             'updated_at' => now()->toDateTimeString(),
         ];
 
@@ -75,8 +74,8 @@ class UserController extends Controller
 
     public function editPage($id){
         $user = User::find($id);
-        $daftar_divisi = Divisi::all();
-        return view('userManagement.updateUser', ['user' => $user, 'daftar_divisi' => $daftar_divisi]);
+        $daftar_bidang = Bidang::all();
+        return view('userManagement.updateUser', ['user' => $user, 'daftar_divisi' => $daftar_bidang]);
     }
 
 }

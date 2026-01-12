@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Presensi Karyawan</title>
-
+    <title>Dashboard Presensi ASN</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <style>
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
+{{-- Navbar --}}
 <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -23,27 +21,26 @@
                     <span class="text-xl font-bold text-indigo-600 tracking-tight">PresensiApp</span>
                 </div>
                 <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-
                     <a href="{{ url('/') }}"
-                       class="{{ request()->is('/') ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition duration-150 ease-in-out">
+                       class="{{ request()->is('/') ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                         Dashboard
                     </a>
 
                     <a href="{{ url('/karyawan') }}"
-                       class="{{ request()->is('karyawan*') ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition duration-150 ease-in-out">
-                        Data Karyawan
+                       class="{{ request()->is('karyawan*') ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                        Data ASN
                     </a>
 
+                    <a href="{{ route('laporan.index') }}"
+                       class="{{ request()->routeIs('laporan.index') ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                        Laporan
+                    </a>
                 </div>
             </div>
-
             <div class="flex items-center">
                 <form action="{{url('/logout')}}" method="POST">
                     @csrf
-                    <button type="submit" class="text-gray-500 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition duration-150 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
+                    <button type="submit" class="text-gray-500 hover:text-red-600 px-3 py-2 text-sm font-medium flex items-center gap-2">
                         Logout
                     </button>
                 </form>
@@ -54,29 +51,95 @@
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
+    {{-- Header --}}
     <div class="md:flex md:items-center md:justify-between mb-8">
         <div class="flex-1 min-w-0">
             <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-                Data Presensi Karyawan
+                Dashboard Presensi
             </h2>
             <p class="mt-1 text-sm text-gray-500">
-                Kelola data kehadiran harian tim Anda di sini.
+                Statistik kehadiran hari ini: <span class="font-bold text-indigo-600">{{ date('d M Y') }}</span>
             </p>
         </div>
+
+        {{-- Tombol Aksi --}}
         <div class="mt-4 flex flex-col md:flex-row gap-3 md:mt-0 md:ml-4">
-            <a href="{{ url('/presensi/generateQR/QR_Masuk') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all">
-                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-                Lihat QR Code Masuk
+            <a href="{{ url('/presensi/generateQR/QR_Masuk') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                QR Masuk
             </a>
-            <a href="{{ url('/presensi/generateQR/QR_Pulang') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all">
-                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-                Lihat QR Code Pulang
+            <a href="{{ url('/presensi/generateQR/QR_Pulang') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
+                QR Pulang
             </a>
-            <a href="{{ route('presensi') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all">
-                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                Input Presensi
+            <a href="{{ route('presensi') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
+                Input Manual
             </a>
         </div>
+    </div>
+
+    {{-- --- BAGIAN CARD --- --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+
+        @foreach($rekap_divisi as $divisi)
+            @php
+                // 1. Warna Card
+                $colors = [
+                    ['bg' => 'bg-blue-600', 'bar' => 'bg-blue-800'],
+                    ['bg' => 'bg-emerald-600', 'bar' => 'bg-emerald-800'],
+                    ['bg' => 'bg-violet-600', 'bar' => 'bg-violet-800'],
+                    ['bg' => 'bg-orange-600', 'bar' => 'bg-orange-800'],
+                ];
+                $theme = $colors[$loop->index % 4];
+
+                // 2. Hitung Persentase untuk Progress Bar
+                $persentase = $divisi->total_anggota > 0
+                    ? ($divisi->jumlah_hadir / $divisi->total_anggota) * 100
+                    : 0;
+            @endphp
+
+            <div class="{{ $theme['bg'] }} rounded-xl shadow-lg p-5 text-white transform hover:scale-105 transition duration-300 relative overflow-hidden group">
+
+                <div class="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white opacity-10 group-hover:scale-150 transition-transform duration-500"></div>
+
+                <div class="flex justify-between items-start z-10 relative">
+                    <div>
+                        <p class="text-blue-100 text-xs font-semibold uppercase tracking-wider opacity-80">Bidang</p>
+                        <h3 class="text-lg font-bold mt-0.5">{{ $divisi->nama_bidang }}</h3>
+                    </div>
+
+                    <div class="bg-white/20 p-2 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex items-baseline gap-1 relative z-10">
+                    <span class="text-4xl font-bold">{{ $divisi->jumlah_hadir }}</span>
+                    <span class="text-xl font-medium text-white/70">/ {{ $divisi->total_anggota }}</span>
+                    <span class="text-xs text-white/70 ml-1">Hadir</span>
+                </div>
+
+                <div class="mt-3 w-full bg-black/20 rounded-full h-1.5 overflow-hidden relative z-10">
+                    <div class="bg-white h-1.5 rounded-full transition-all duration-1000 ease-out"
+                         style="width: {{ $persentase }}%"></div>
+                </div>
+
+                <div class="mt-1 text-right">
+                    <span class="text-[10px] text-white/80 font-medium">{{ round($persentase) }}% Lengkap</span>
+                </div>
+
+            </div>
+        @endforeach
+
+
+        @if($rekap_divisi->isEmpty())
+            <div class="col-span-full text-center py-8 bg-white rounded-xl border-2 border-dashed border-gray-300 text-gray-400">
+                <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                <span class="mt-2 block text-sm font-medium">Belum ada data divisi</span>
+            </div>
+        @endif
     </div>
 
     <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
@@ -85,8 +148,8 @@
                 <thead class="bg-gray-50">
                 <tr>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Karyawan</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Divisi</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ASN</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bidang</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jam Kerja</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -96,86 +159,50 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                 @forelse($daftar_presensi as $item)
                     <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $loop->iteration }}
-                        </td>
-
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="h-10 w-10 flex-shrink-0 bg-indigo-100 rounded-full flex items-center justify-center">
-                                        <span class="text-indigo-700 font-bold text-sm">
-                                            {{ substr($item->user->Nama_Pengguna ?? 'U', 0, 1) }}
-                                        </span>
+                                    <span class="text-indigo-700 font-bold text-sm">{{ substr($item->user->Nama_Pengguna ?? 'U', 0, 1) }}</span>
                                 </div>
                                 <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">
-                                        {{ $item->user->Nama_Pengguna ?? 'User Terhapus' }}
-                                    </div>
-                                    <div class="text-sm text-gray-500">
-                                        {{ $item->user->email ?? '-' }}
-                                    </div>
+                                    <div class="text-sm font-medium text-gray-900">{{ $item->user->Nama_Pengguna ?? 'User Terhapus' }}</div>
+                                    <div class="text-sm text-gray-500">{{ $item->user->email ?? '-' }}</div>
                                 </div>
                             </div>
                         </td>
-
                         <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                    {{ $item->user->divisi->Nama_Divisi ?? '-' }}
-                                </span>
+                            <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                {{ $item->user->bidang->nama_bidang ?? '-' }}
+                            </span>
                         </td>
-
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            {{ $item->tanggal }}
-                        </td>
-
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ $item->tanggal }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <div class="flex flex-col">
-                                @if($item->jam_masuk != null)
-                                <span class="text-green-600 font-medium">In: {{ $item->jam_masuk ?? '--:--' }}</span>
-                                @else
-                                <span class="text-red-500 font-medium">Out: {{ $item->jam_pulang ?? '--:--' }}</span>
-                                @endif
-                            </div>
+                            @if($item->jam_masuk != null)
+                                <span class="text-green-600 font-medium">In: {{ $item->jam_masuk }}</span>
+                            @else
+                                <span class="text-red-500 font-medium">Out: {{ $item->jam_pulang }}</span>
+                            @endif
                         </td>
-
                         <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full
-                                    {{ ($item->status ?? 'Hadir') == 'Hadir' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                    {{ $item->status ?? 'Hadir' }}
-                                </span>
+                            <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full
+                                {{ ($item->status ?? 'Hadir') == 'Hadir' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                {{ $item->status ?? 'Hadir' }}
+                            </span>
                         </td>
-
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex justify-end items-center gap-2">
-                                <a href="{{ url('/presensi/edit/' . $item->id) }}" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 p-2 rounded-lg transition" title="Edit">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                    </svg>
-                                </a>
-
-                                <form action="{{ url('/presensi/delete', ['id' => $item->id]) }}" method="post" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
-                                    @method('DELETE')
-                                    @csrf
-                                    <button type="submit" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition" title="Hapus">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                    </button>
+                                <a href="{{ url('/presensi/edit/' . $item->id) }}" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 p-2 rounded-lg">Edit</a>
+                                <form action="{{ url('/presensi/delete', ['id' => $item->id]) }}" method="post" onsubmit="return confirm('Hapus?');">
+                                    @method('DELETE') @csrf
+                                    <button type="submit" class="text-red-600 hover:text-red-900 bg-red-50 p-2 rounded-lg">Hapus</button>
                                 </form>
                             </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="px-6 py-10 text-center text-gray-500 bg-gray-50">
-                            <div class="flex flex-col items-center justify-center">
-                                <svg class="h-12 w-12 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                </svg>
-                                <p class="text-base font-medium text-gray-900">Belum ada data presensi.</p>
-                                <p class="text-sm mt-1">Silakan input presensi baru atau buat QR Code.</p>
-                            </div>
-                        </td>
+                        <td colspan="8" class="px-6 py-10 text-center text-gray-500 bg-gray-50">Belum ada data.</td>
                     </tr>
                 @endforelse
                 </tbody>
@@ -184,7 +211,7 @@
     </div>
 
     <div class="mt-4 text-center">
-        <p class="text-xs text-gray-400">&copy; {{ date('Y') }} Sistem Presensi Karyawan</p>
+        <p class="text-xs text-gray-400">&copy; {{ date('Y') }} Sistem Presensi ASN</p>
     </div>
 </div>
 

@@ -34,8 +34,9 @@ class User extends Authenticatable
         'email',
         'password',
         'NIP',
-        'Id_Divisi',
+        'id_bidang',
         'updated_at',
+        'Jabatan'
     ];
 
     /**
@@ -65,8 +66,9 @@ class User extends Authenticatable
         return $this->hasMany(presensi::class, 'user_id', 'user_id');
     }
 
-    public function divisi(): BelongsTo
+// Di Model User.php
+    public function bidang()
     {
-        return $this->belongsTo(Divisi::class, 'Id_Divisi', 'Id_Divisi');
+        return $this->belongsTo(Bidang::class, 'id_bidang', 'id_bidang');
     }
 }

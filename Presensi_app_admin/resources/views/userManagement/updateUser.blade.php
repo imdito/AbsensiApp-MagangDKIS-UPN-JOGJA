@@ -71,18 +71,18 @@
                 </div>
 
                 <div>
-                    <label for="Id_Divisi" class="block text-sm font-medium text-gray-700">Divisi</label>
+                    <label for="id_bidang" class="block text-sm font-medium text-gray-700">Divisi</label>
                     <div class="mt-1">
-                        <select name="Id_Divisi" id="Id_Divisi" required
+                        <select name="id_bidang" id="id_bidang" required
                                 class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white">
 
                             <option value="" disabled>-- Pilih Divisi --</option>
 
                             @foreach($daftar_divisi as $item)
-                                <option value="{{ $item->Id_Divisi }}"
-                                    {{ old('Id_Divisi', $user->Id_Divisi) == $item->Id_Divisi ? 'selected' : '' }}>
+                                <option value="{{ $item->id_bidang }}"
+                                    {{ old('id_bidang', $user->id_bidang) == $item->id_bidang ? 'selected' : '' }}>
 
-                                    {{ $item->Nama_Divisi }}
+                                    {{ $item->nama_bidang }}
                                 </option>
                             @endforeach
 

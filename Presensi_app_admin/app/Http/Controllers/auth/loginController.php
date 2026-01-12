@@ -23,8 +23,6 @@ class loginController extends controller{
             return redirect()->intended('/');
         }
         return back()->with('message', 'Login failed!');
-
-
     }
 
     public function logout(Request $request){
@@ -52,7 +50,7 @@ class loginController extends controller{
                     'user_id' => $user->user_id,
                     'nama' => $user->Nama_Pengguna,
                     'email' => $user->email,
-                    'divisi' => $user->divisi->Nama_Divisi,
+                    'divisi' => $user->bidang->nama_bidang,
                     'NIP' => $user->NIP,
 
                 ]

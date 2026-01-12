@@ -69,16 +69,16 @@
                 </div>
 
                 <div>
-                    <label for="Id_Divisi" class="block text-sm font-medium text-gray-700">Divisi / Jabatan</label>
-                    <select name="Id_Divisi" id="Id_Divisi" required
+                    <label for="id_bidang" class="block text-sm font-medium text-gray-700">Bidang</label>
+                    <select name="id_bidang" id="id_bidang" required
                             class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white">
 
-                        <option value="" disabled>-- Pilih Divisi --</option>
+                        <option value="" disabled>-- Pilih Bidang --</option>
 
                         @foreach($daftar_divisi as $item)
-                            <option value="{{ $item->Id_Divisi }}">
+                            <option value="{{ $item->id_bidang }}">
 
-                                {{ $item->Nama_Divisi }}
+                                {{ $item->nama_bidang }}
                             </option>
                         @endforeach
 

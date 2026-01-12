@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\Tipe_QR;
+use App\Models\Bidang;
 use App\Models\presensi;
 use App\Models\QrToken;
 use App\Models\User;
@@ -11,20 +12,24 @@ use Illuminate\Support\Str;
 use mysql_xdevapi\Exception;
 
 class PresensiController extends Controller{
-    public function index(){
+    public function index()
+    {
+        $daftar_presensi = Presensi::with(['user.bidang'])->orderBy('tanggal', 'desc')->get();
 
-    // Mengambil semua data presensi DAN data user pemiliknya
-    // Pastikan nama relasi di Model Presensi adalah 'user'
-    $data_presensi = presensi::with('user')->orderBy('id', 'desc')->get();
-
-    return view('app.index',
-        [
-            'daftar_presensi' => $data_presensi
-        ]);
+        $rekap_divisi = Bidang::withCount([
+            'users as total_anggota',
+            'users as jumlah_hadir' => function($query) {
+                $query->whereHas('presensi', function($q) {
+                    $q->whereDate('tanggal', date('Y-m-d'))
+                        ->whereIn('status', ['Hadir', 'Telat']);
+                });
+            }
+        ])->get();
+        return view('app.index', compact('daftar_presensi', 'rekap_divisi'));
     }
 
     public function create(){
-        $users = User::all();
+        $users = User::lazy();
         return view('app.create', ['users' => $users]);
     }
 

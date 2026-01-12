@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Karyawan</title>
+    <title>Data ASN</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
 <body class="bg-gray-50 text-gray-800">
-
 <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -18,9 +17,29 @@
                     <span class="text-xl font-bold text-indigo-600 tracking-tight">PresensiApp</span>
                 </div>
                 <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                    <a href="{{ url('/') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Dashboard</a>
-                    <a href="{{ url('/karyawan') }}" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Data Karyawan</a>
+                    <a href="{{ url('/') }}"
+                       class="{{ request()->is('/') ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                        Dashboard
+                    </a>
+
+                    <a href="{{ url('/karyawan') }}"
+                       class="{{ request()->is('karyawan*') ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                        Data ASN
+                    </a>
+
+                    <a href="{{ route('laporan.index') }}"
+                       class="{{ request()->routeIs('laporan.index') ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                        Laporan
+                    </a>
                 </div>
+            </div>
+            <div class="flex items-center">
+                <form action="{{url('/logout')}}" method="POST">
+                    @csrf
+                    <button type="submit" class="text-gray-500 hover:text-red-600 px-3 py-2 text-sm font-medium flex items-center gap-2">
+                        Logout
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -31,7 +50,7 @@
     <div class="md:flex md:items-center md:justify-between mb-8">
         <div class="flex-1 min-w-0">
             <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-                Master Data Karyawan
+                Master Data ASN
             </h2>
             <p class="mt-1 text-sm text-gray-500">
                 Kelola akun pengguna dan data pegawai.
@@ -42,7 +61,7 @@
                 <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                 </svg>
-                Tambah Karyawan
+                Tambah ASN
             </a>
         </div>
     </div>
@@ -55,7 +74,8 @@
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama & Email</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NIP</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Divisi</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bidang</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jabatan</th>
                     <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                 </tr>
                 </thead>
@@ -81,7 +101,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">
-                                    {{ $user->divisi->Nama_Divisi ?? 'Staff' }}
+                                    {{ $user->bidang->nama_bidang ?? 'Staff' }}
                                 </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -91,7 +111,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                 </a>
-                                <form action="{{url('/karyawan/delete/' . $user->user_id)}}" method="POST" onsubmit="return confirm('Hapus karyawan ini?');">
+                                <form action="{{url('/karyawan/delete/' . $user->user_id)}}" method="POST" onsubmit="return confirm('Hapus ASN ini?');">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-900 bg-red-50 p-2 rounded-lg" title="Hapus User">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -105,7 +125,7 @@
                 @empty
                     <tr>
                         <td colspan="5" class="px-6 py-10 text-center text-gray-500">
-                            Belum ada data karyawan.
+                            Belum ada data ASN.
                         </td>
                     </tr>
                 @endforelse

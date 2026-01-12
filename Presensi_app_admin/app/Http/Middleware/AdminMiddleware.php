@@ -16,8 +16,12 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->Id_Divisi === 1) {
+        if (Auth::check() && Auth::user()->id_bidang === 1) {
             return $next($request);
+        }
+
+        if(Auth::check() && Auth::user()->id_bidang !== 1){
+            return redirect('/mobile-only')->with('message', 'Anda tidak memiliki akses admin.');
         }
 
         // Jika bukan admin, kirim respon error JSON

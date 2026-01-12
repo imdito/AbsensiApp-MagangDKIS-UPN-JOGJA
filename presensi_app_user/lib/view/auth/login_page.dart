@@ -33,15 +33,7 @@ class LoginPage extends StatelessWidget {
                   child: Container(
                     height: 80,
                     width: 80,
-                    decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Icon(
-                      Icons.verified_user_outlined,
-                      size: 40,
-                      color: primaryColor,
-                    ),
+                    child: Ink.image(image: AssetImage('../assets/logoDKIS.png'), fit: BoxFit.contain)
                   ),
                 ),
                 const SizedBox(height: 24),

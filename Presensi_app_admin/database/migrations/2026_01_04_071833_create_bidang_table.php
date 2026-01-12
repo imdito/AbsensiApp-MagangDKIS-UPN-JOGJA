@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('divisi', function (Blueprint $table) {
-            $table->id('Id_Divisi');
-            $table->string('Nama_Divisi', 100);
-            // user_id dihapus dari sini sesuai saran Anda
+        Schema::create('bidang', function (Blueprint $table) {
+            $table->id('id_bidang'); // Langsung id_bidang
+            $table->string('kode_bidang', 20)->unique();
+            $table->string('nama_bidang', 100);
         });
     }
 

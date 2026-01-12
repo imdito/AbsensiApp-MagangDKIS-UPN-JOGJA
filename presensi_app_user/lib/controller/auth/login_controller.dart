@@ -56,7 +56,7 @@ class LoginController extends GetxController {
 
         Get.snackbar("Sukses", "Login Berhasil",
             snackPosition: SnackPosition.BOTTOM, backgroundColor: Get.theme.primaryColorLight);
-
+        dispose();
         Get.to(const HomePage(), arguments: {
           'user': user,
           'token': newToken,

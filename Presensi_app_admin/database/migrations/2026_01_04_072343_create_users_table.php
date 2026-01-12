@@ -17,11 +17,8 @@ return new class extends Migration
             $table->string('Password', 100);
             $table->string('Nama_Pengguna', 100);
             $table->string('NIP', 100);
-
-            // Foreign Key ke tabel divisi
-            $table->unsignedBigInteger('Id_Divisi');
-            $table->foreign('Id_Divisi')->references('Id_Divisi')->on('divisi')->onDelete('cascade');
-
+            $table->foreignId('id_bidang')->constrained('bidang', 'id_bidang'); // Langsung relasi ke bidang
+            $table->string('Jabatan')->default('user');
             $table->timestamps();
         });
     }

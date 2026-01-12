@@ -52,7 +52,6 @@ class ScanPresensiView extends StatelessWidget {
             onDetect: (capture) {
               controller.onDetect(capture);
               showFloatingNotif(context, "Presensi berhasil dicatat!", true);
-              Get.back();
             },
           ),
 

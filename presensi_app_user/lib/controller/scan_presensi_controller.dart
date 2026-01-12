@@ -89,6 +89,7 @@ class ScanPresensiController extends GetxController {
       // );
       
       print("Sukses presensi: ${response.body}");
+      Get.back();
 
     } catch (e) {
       // Tutup Loading jika error
@@ -140,9 +141,9 @@ class ScanPresensiController extends GetxController {
       }
 
       if (permission == LocationPermission.deniedForever) {
-        // Jika user menolak permanen (pilih 'Don't ask again')
         Get.snackbar("Penting", "Izin lokasi dimatikan permanen. Buka pengaturan HP.");
-        return; // Opsional: Geolocator.openAppSettings();
+        Geolocator.openAppSettings();
+        return;
       }
 
       // 3. AMBIL KOORDINAT (Jika semua aman)

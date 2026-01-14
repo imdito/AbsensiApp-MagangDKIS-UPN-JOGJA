@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\auth\loginController;
+use App\Http\Controllers\BidangController;
 use App\Http\Controllers\presensiManagement\LaporanController;
 use App\Http\Controllers\presensiManagement\QRController;
 use App\Http\Controllers\userManagement\UserController;
@@ -38,6 +39,10 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
 
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
     Route::post('/laporan/cetak', [LaporanController::class, 'print'])->name('laporan.print');
+
+
+    //Bidang Management
+    Route::resource('bidang', BidangController::class);
 
 });
 

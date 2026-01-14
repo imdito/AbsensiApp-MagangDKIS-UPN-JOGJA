@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-void showFloatingNotif(BuildContext context, String message, bool isSuccess) {
+void notifPresensi(BuildContext context, String message, bool isSuccess) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       // Isi konten (Icon + Teks)

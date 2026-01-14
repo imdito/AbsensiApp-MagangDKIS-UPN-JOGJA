@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:geolocator/geolocator.dart'; // Import ini untuk handling setting
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 import 'package:mobile_scanner/mobile_scanner.dart';
-
+import '../services/location_service.dart';
+import '../services/presensi_api_service.dart';
 import '../utils/notif_presensi.dart';
 
 class ScanPresensiController extends GetxController {
+  final LocationService _locationService = LocationService();
+  final PresensiApiService _apiService = PresensiApiService();
   final MobileScannerController cameraController = MobileScannerController();
+
   var idUser = Get.arguments;
-  // Variabel untuk mencegah pemindaian berulang (spam)
   var isScanning = false.obs;
   var isLoading = false.obs;
   var latitude = 0.0.obs;
   var longitude = 0.0.obs;
   var message = ''.obs;
-  String baseUrl = dotenv.env['BASE_URL'] ?? 'fallback_url';
-
-
 
   @override
   void onClose() {
@@ -26,142 +24,109 @@ class ScanPresensiController extends GetxController {
     super.onClose();
   }
 
-  // Fungsi yang dipanggil saat QR terdeteksi
-  void onDetect(BarcodeCapture capture) async {
-    // 1. Cek apakah sedang memproses data? Jika ya, hentikan (return)
+  void onDetect(BarcodeCapture capture, BuildContext context) async {
     if (isScanning.value || isLoading.value) return;
 
     final List<Barcode> barcodes = capture.barcodes;
-
-    if (barcodes.isNotEmpty) {
-      final code = barcodes.first.rawValue;
-      String type = "QR_Masuk";
-      type = barcodes.first.type.name;
-
-      if (code != null) {
-        // 2. Kunci scanner agar tidak scan ulang
-        isScanning.value = true;
-        // 3. Panggil fungsi proses ke backend
-        await processAbsence(code);
-      }
+    if (barcodes.isNotEmpty && barcodes.first.rawValue != null) {
+      isScanning.value = true;
+      final code = barcodes.first.rawValue!;
+      await _handlePresensiProcess(code, context);
     }
   }
 
-  // Simulasi kirim data ke Backend
-  Future<void> processAbsence(String qrCode) async {
+  Future<void> _handlePresensiProcess(String qrCode, BuildContext context) async {
+    // Tampilkan Loading
+    _showLoadingDialog();
 
     try {
       isLoading.value = true;
-      print("Memproses presensi untuk kode: $qrCode");
-      // Tampilkan Loading Dialog
-      Get.dialog(
-        const Center(child: CircularProgressIndicator()),
-        barrierDismissible: false,
-      );
 
-      //ambil lokasi
-      await ambilLokasi();
+      // 1. Ambil Lokasi (Akan throw error jika GPS mati/Ditolak)
+      final position = await _locationService.getCurrentLocation();
 
-      var response =  await http.post(Uri.parse('$baseUrl/api/presensiViaQR'),
-        headers: {
-          'Accept': 'application/json',
-
-        },
-        body: {
-          'qr_token' : qrCode,
-          'user_id' : idUser.toString(),
-          'tanggal' : DateTime.now().toIso8601String(),
-          'status'  : 'Hadir',
-          'jam_absen' : TimeOfDay.now().format(Get.context!),
-          'Latitude' : latitude.value.toString(),
-          'Longitude' : longitude.value.toString(),
-        });
-
-
-      // Tampilkan Sukses
-      // Get.snackbar(
-      //   "Berhasil",
-      //   "Presensi tercatat untuk kode: $qrCode",
-      //   backgroundColor: Colors.green,
-      //   colorText: Colors.white,
-      //   snackPosition: SnackPosition.BOTTOM,
-      //   margin: const EdgeInsets.all(10),
-      // );
-      
-      print("Sukses presensi: ${response.body}");
-      Get.back();
-
-    } catch (e) {
-      // Tutup Loading jika error
-      Get.back();
-
-      // Tampilkan Error
-      // Get.snackbar(
-      //   "Gagal",
-      //   e.toString(),
-      //   backgroundColor: Colors.red,
-      //   colorText: Colors.white,
-      //   snackPosition: SnackPosition.BOTTOM,
-      //   margin: const EdgeInsets.all(10),
-      // );
-
-      print("Gagal presensi: $e");
-
-      // Reset agar user bisa mencoba scan lagi segera
-      isScanning.value = false;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  void toggleFlash() {
-    cameraController.toggleTorch();
-  }
-
-  Future<void> ambilLokasi() async {
-    isLoading.value = true;
-    try {
-      // 1. Cek apakah GPS (Service) Nyala?
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        Get.snackbar("Error", "GPS belum aktif. Mohon nyalakan GPS Anda.");
-        return;
-      }
-
-      // 2. Cek Izin Aplikasi (Permission)
-      LocationPermission permission = await Geolocator.checkPermission();
-
-      if (permission == LocationPermission.denied) {
-        // Jika belum ada izin, minta user
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          Get.snackbar("Gagal", "Izin lokasi ditolak");
-          return;
-        }
-      }
-
-      if (permission == LocationPermission.deniedForever) {
-        Get.snackbar("Penting", "Izin lokasi dimatikan permanen. Buka pengaturan HP.");
-        Geolocator.openAppSettings();
-        return;
-      }
-
-      // 3. AMBIL KOORDINAT (Jika semua aman)
-      // High accuracy cocok untuk presensi (radius kecil)
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high
-      );
-
-      // Simpan ke variabel
+      // Update state
       latitude.value = position.latitude;
       longitude.value = position.longitude;
-      message.value = "Lokasi didapat: ${position.latitude}, ${position.longitude}";
-      print("Lokasi : ${message.value}");
+
+      // 2. Hitung Jarak
+      double jarak = _locationService.getDistanceFromOffice(latitude.value, longitude.value);
+
+      if (!_locationService.isWithinOfficeRadius(jarak)) {
+        throw "Jarak terlalu jauh: ${jarak.toStringAsFixed(2)} meter. (Maks 50m)";
+      }
+
+      // 3. Kirim API
+      final response = await _apiService.submitPresensi(
+        qrCode: qrCode,
+        userId: idUser.toString(),
+        latitude: latitude.value,
+        longitude: longitude.value,
+        context: context,
+      );
+
+      // 4. Sukses
+      _closeLoadingDialog(); // Tutup loading dulu
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Handle sukses visual disini (misal pindah halaman atau snackbar sukses)
+        message.value = "Presensi Berhasil!";
+        notifPresensi(context, message.value, true);
+        Get.back();
+      } else {
+        throw "Gagal dari server: ${response.statusCode}";
+      }
+
     } catch (e) {
-      Get.snackbar("Error", "Gagal mengambil lokasi: $e");
+
+      _closeLoadingDialog(); // 1. TUTUP LOADING
+
+      // 2. tampilkan pesan error/snackbar
+      String errorMsg = e.toString();
+
+      // Handle khusus jika permission denied forever
+      if (errorMsg.contains('location_denied_forever')) {
+        Get.defaultDialog(
+            title: "Izin Lokasi",
+            middleText: "Izin lokasi dimatikan permanen. Mohon nyalakan di pengaturan.",
+            textConfirm: "Buka Pengaturan",
+            textCancel: "Batal",
+            onConfirm: () {
+              Geolocator.openAppSettings();
+              Get.back(); // Tutup dialog konfirmasi
+            }
+        );
+      } else {
+        // Tampilkan Snackbar Error biasa
+        notifPresensi(context, errorMsg.replaceAll("Exception: ", ""), false);
+      }
+      await Future.delayed(const Duration(seconds: 2));
+      // 3. Reset scanning agar bisa scan lagi
+      isScanning.value = false;
+
     } finally {
       isLoading.value = false;
     }
   }
-}
 
+  // --- Helper UI ---
+
+  void _showLoadingDialog() {
+    Get.dialog(
+      const PopScope(
+        canPop: false, // Mencegah user menutup loading dengan tombol back
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+  void _closeLoadingDialog() {
+    // Cek apakah dialog sedang terbuka (untuk menghindari menutup halaman lain)
+    if (Get.isDialogOpen == true) {
+      Get.back();
+    }
+  }
+
+  void toggleFlash() => cameraController.toggleTorch();
+}

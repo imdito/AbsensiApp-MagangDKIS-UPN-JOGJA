@@ -16,7 +16,7 @@ class SplashPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Image(image: AssetImage('../assets/logoDKIS.png'), height: 120),
+            const Image(image: AssetImage('assets/logoDKIS.png'), height: 120),
             const SizedBox(height: 20),
             const CircularProgressIndicator(), // Loading muter
             const SizedBox(height: 20),

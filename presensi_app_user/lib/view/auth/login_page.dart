@@ -33,7 +33,7 @@ class LoginPage extends StatelessWidget {
                   child: Container(
                     height: 80,
                     width: 80,
-                    child: Ink.image(image: AssetImage('../assets/logoDKIS.png'), fit: BoxFit.contain)
+                    child: Ink.image(image: AssetImage('assets/logoDKIS.png'), fit: BoxFit.contain)
                   ),
                 ),
                 const SizedBox(height: 24),

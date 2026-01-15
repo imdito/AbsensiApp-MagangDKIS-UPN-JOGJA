@@ -73,7 +73,11 @@ class ScanPresensiController extends GetxController {
         message.value = "Presensi Berhasil!";
         notifPresensi(context, message.value, true);
         Get.back();
-      } else {
+      } else if(response.statusCode == 500){
+        throw "Maaf, Presensi Telah Ditutup";
+      }else {
+
+        print("Response Body: ${response.body}");
         throw "Gagal dari server: ${response.statusCode}";
       }
 
@@ -98,6 +102,7 @@ class ScanPresensiController extends GetxController {
         );
       } else {
         // Tampilkan Snackbar Error biasa
+        print("Error : $errorMsg");
         notifPresensi(context, errorMsg.replaceAll("Exception: ", ""), false);
       }
       await Future.delayed(const Duration(seconds: 2));

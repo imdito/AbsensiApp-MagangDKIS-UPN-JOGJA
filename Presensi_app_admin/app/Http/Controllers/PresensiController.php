@@ -84,20 +84,33 @@ class PresensiController extends Controller{
 
     public function destroy($id)
     {
-        presensi::where('id', $id)->delete();
+        $data = presensi::find($id);
+        $data->delete();
         return redirect('/');
     }
 
     public function storeViaQR(Request $request){
         $request ->validate([
-           'qr_token' => 'required',
+            'qr_token' => 'required',
             'user_id' => 'required',
-            'tanggal' => 'required|date',
-            'status' => 'required|in:Hadir,Izin,Tidak Hadir',
-            'jam_absen' => 'required',
             'Latitude' => 'required',
             'Longitude' => 'required',
         ]);
+
+        $jam_absen = now()->format('H:i:s');
+        $tepat_waktu = '14:30:00';
+        $batas_absen = '15:00:00';
+
+        $status = 'Hadir';
+        if($jam_absen > $tepat_waktu && $jam_absen <= $batas_absen){
+            $status = 'Telat';
+        }else if($jam_absen > $batas_absen){
+            $status = 'Tidak Hadir';
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Anda terlambat melebihi batas absen. Silakan hubungi admin.'
+            ], 500);
+        }
 
         $validasiToken =QrToken::where('token', $request->qr_token)
             ->where('Expired_at', '>=', Carbon::now()->toDateTimeString() )->first();
@@ -120,9 +133,9 @@ class PresensiController extends Controller{
                 presensi::create([
                     'Id_QR' => $validasiToken->Id_QR,
                     'user_id' => $request->user_id,
-                    'tanggal' => $request->tanggal,
-                    'status' => $request->status,
-                    $tipeAbsen => $request->jam_absen,
+                    'tanggal' => Carbon::now()->toDateString(),
+                    'status' => $status,
+                    $tipeAbsen => Carbon::now()->toDateTimeString(),
                     'Longitude' => $request->Longitude,
                     'Latitude' => $request->Latitude,
                     'created_at' => now(),

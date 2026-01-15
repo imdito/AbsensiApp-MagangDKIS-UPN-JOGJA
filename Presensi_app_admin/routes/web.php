@@ -15,7 +15,7 @@ Route::middleware('guest')->group(function () {
 
 });
 
-Route::middleware(['auth', 'is_admin'])->group(function () {
+Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
 
     Route::get('/', [PresensiController::class, 'index'])->name('home');
 

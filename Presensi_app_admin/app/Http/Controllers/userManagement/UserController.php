@@ -68,7 +68,8 @@ class UserController extends Controller
     }
 
     public function destroy($id){
-        User::where('user_id', $id)->delete();
+        $data = User::find($id);
+        $data->delete();
         return redirect('/karyawan')->with('sukses', 'Data berhasil dihapus');
     }
 

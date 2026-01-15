@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Route;
 //    return $request->user();
 //})->middleware('auth:sanctum');
 
-Route::post('/login', [loginController::class, 'loginAPI']);
-Route::get('/tesapi', function(){
-    return 'alok';
-});
+Route::post('/login', [loginController::class, 'loginAPI'])->middleware('guest');
 
-Route::post('/presensiViaQR', [presensiController::class, 'storeViaQR']);
+Route::post('/presensiViaQR', [presensiController::class, 'storeViaQR'])->middleware('auth:sanctum');

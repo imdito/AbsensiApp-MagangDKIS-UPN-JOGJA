@@ -6,6 +6,7 @@ namespace App\Models;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Model;
@@ -15,7 +16,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, softDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -60,6 +61,23 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'Password' => 'hashed',
         ];
+    }
+
+    protected $dates = ['deleted_at'];
+
+    protected static function booted(): void
+    {
+        static::creating(function ($model) {
+            $model->created_id = auth()->id();
+        });
+        static::updating(function ($model) {
+            $model->updated_id = auth()->id();
+        });
+        static::deleting(function ($model) {
+            $model->deleted_id = auth()->id();
+            $model->save();
+        });
+
     }
 
     public function presensi(){

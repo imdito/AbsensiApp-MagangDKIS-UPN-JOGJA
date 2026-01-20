@@ -3,6 +3,7 @@ import 'package:presensi_app_user/model/user_model.dart';
 import 'package:presensi_app_user/view/scan_presensi_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../utils/biometrik_auth.dart';
 import '../view/auth/login_page.dart';
 
 class HomeController extends GetxController {
@@ -20,9 +21,15 @@ class HomeController extends GetxController {
   var jamPulang = '05:00 PM'.obs;
 
   // Navigasi
-  void goToPresensi() {
+  Future<void> goToPresensi() async {
     print("Navigasi ke Halaman Presensi/Scan QR");
-    Get.to(() => ScanPresensiView(), arguments: user.id);
+    final BiometrikAuth biometrikAuth = BiometrikAuth();
+    bool isAuthenticated = await biometrikAuth.authenticate('Verifikasi untuk Melakukan Presensi');
+    if(isAuthenticated){
+      Get.to(() => ScanPresensiView(), arguments: user.id);
+    }else{
+      Get.snackbar('Error', 'Biometrik tidak ditemukan');
+    }
   }
 
   void goToEditProfile() {

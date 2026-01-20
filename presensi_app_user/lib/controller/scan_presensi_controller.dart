@@ -66,14 +66,14 @@ class ScanPresensiController extends GetxController {
       );
 
       // 4. Sukses
-      _closeLoadingDialog(); // Tutup loading dulu
+      _closeLoadingDialog(); // Tutup loading
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // Handle sukses visual disini (misal pindah halaman atau snackbar sukses)
         message.value = "Presensi Berhasil!";
         notifPresensi(context, message.value, true);
         Get.back();
       } else if(response.statusCode == 500){
+        print("Response Body: ${response.body}");
         throw "Maaf, Presensi Telah Ditutup";
       }else {
 

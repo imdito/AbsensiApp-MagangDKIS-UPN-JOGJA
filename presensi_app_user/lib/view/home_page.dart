@@ -8,13 +8,11 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //  Controller
     final HomeController controller = Get.put(HomeController());
+
     // Warna Tema
     const Color primaryColor = Color(0xFF4F46E5); // Indigo 600
-    const Color secondaryColor = Color(0xFFEEF2FF); // Indigo 50
     const Color grayBg = Color(0xFFF9FAFB);
-    const Color grayText = Color(0xFF6B7280);
 
     return Scaffold(
       backgroundColor: grayBg,
@@ -33,7 +31,6 @@ class HomePage extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  // Top Bar (Profile & Logout)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -42,30 +39,19 @@ class HomePage extends StatelessWidget {
                         children: [
                           Text(
                             'Halo, Selamat ${controller.statusHari()}',
-                            style: GoogleFonts.inter(
-                              color: Colors.white70,
-                              fontSize: 14,
-                            ),
+                            style: GoogleFonts.inter(color: Colors.white70, fontSize: 14),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             controller.user.nama,
-                            style: GoogleFonts.inter(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: GoogleFonts.inter(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                           Text(
                             controller.user.divisi,
-                            style: GoogleFonts.inter(
-                              color: Colors.indigo.shade200,
-                              fontSize: 12,
-                            ),
+                            style: GoogleFonts.inter(color: Colors.indigo.shade200, fontSize: 12),
                           )
                         ],
                       ),
-                      // Logout Icon Button
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
@@ -82,11 +68,11 @@ class HomePage extends StatelessWidget {
               ),
             ),
 
-            // --- ATTENDANCE STATUS CARD (Floating) ---
+            // --- STATUS CARD ---
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Transform.translate(
-                offset: const Offset(0, -30), // Efek overlap ke atas
+                offset: const Offset(0, -30),
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -112,14 +98,14 @@ class HomePage extends StatelessWidget {
               ),
             ),
 
-            // --- MENU GRID ---
+            // --- MENU SECTION ---
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Menu Utama",
+                    "Daftar Menu  ",
                     style: GoogleFonts.inter(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -128,47 +114,40 @@ class HomePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  // Grid Layout
-                  GridView.count(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 1.1, // Mengatur rasio lebar:tinggi kartu
+                  // 1. MAIN CARD
+                  _buildHeroCard(
+                    title: "Scan Kehadiran",
+                    subtitle: "Tap untuk scan QR",
+                    icon: Icons.qr_code_scanner,
+                    color: primaryColor,
+                    onTap: controller.goToPresensi,
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // 2. SECONDARY CARDS - Side by Side (Row)
+                  Row(
                     children: [
-
-                      // 1. Menu PRESENSI (Main Feature)
-                      _buildMenuCard(
-                        title: "Presensi",
-                        icon: Icons.qr_code_scanner,
-                        color: primaryColor,
-                        onTap: controller.goToPresensi,
-                        isPrimary: true, // Highlighted
+                      // Riwayat
+                      Expanded(
+                        child: _buildSecondaryCard(
+                          title: "Riwayat",
+                          icon: Icons.history,
+                          color: Colors.teal,
+                          onTap: () {},
+                        ),
                       ),
 
-                      // 2. Menu EDIT PROFILE
-                      _buildMenuCard(
-                        title: "Edit Profil",
-                        icon: Icons.person_outline,
-                        color: Colors.blueAccent,
-                        onTap: controller.goToEditProfile,
-                      ),
+                      const SizedBox(width: 16),
 
-                      // 3. Menu RIWAYAT (Tambahan agar grid seimbang)
-                      _buildMenuCard(
-                        title: "Riwayat",
-                        icon: Icons.history,
-                        color: Colors.teal,
-                        onTap: () {},
-                      ),
-
-                      // 4. Menu IZIN / SAKIT (Tambahan)
-                      _buildMenuCard(
-                        title: "Pengajuan Izin",
-                        icon: Icons.note_alt_outlined,
-                        color: Colors.orange,
-                        onTap: () {},
+                      // Edit Profil
+                      Expanded(
+                        child: _buildSecondaryCard(
+                          title: "Edit Profil",
+                          icon: Icons.person_outline,
+                          color: Colors.blueAccent,
+                          onTap: controller.goToEditProfile,
+                        ),
                       ),
                     ],
                   ),
@@ -183,7 +162,9 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // Widget Helper: Item Status (Jam Masuk/Pulang)
+  // --- WIDGET HELPER ---
+
+  // 1. Status Item
   Widget _buildStatusItem(String label, String time, IconData icon, Color color) {
     return Column(
       children: [
@@ -198,39 +179,101 @@ class HomePage extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           time,
-          style: GoogleFonts.inter(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF111827),
-          ),
+          style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFF111827)),
         ),
         Text(
           label,
-          style: GoogleFonts.inter(
-            fontSize: 12,
-            color: Colors.grey.shade500,
-          ),
+          style: GoogleFonts.inter(fontSize: 12, color: Colors.grey.shade500),
         ),
       ],
     );
   }
 
-  // Widget Helper: Menu Card
-  Widget _buildMenuCard({
+  // 2. HERO CARD
+  Widget _buildHeroCard({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(24),
+      child: Container(
+        width: double.infinity, // Full Width
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+            color: color, // Warna Primary (Indigo)
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.4),
+                blurRadius: 12,
+                offset: const Offset(0, 8),
+              ),
+            ],
+            image: const DecorationImage(
+              image: AssetImage('assets/pattern_bg.png'), // Opsional: jika ada pattern
+              opacity: 0.1,
+              fit: BoxFit.cover,
+            )
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(icon, color: Colors.white, size: 36),
+            ),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.inter(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: Colors.white70,
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(),
+            const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 16)
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 3. SECONDARY CARD
+  Widget _buildSecondaryCard({
     required String title,
     required IconData icon,
     required Color color,
     required VoidCallback onTap,
-    bool isPrimary = false,
   }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
       child: Container(
+        height: 120,
         decoration: BoxDecoration(
-          color: isPrimary ? color : Colors.white,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: isPrimary ? null : Border.all(color: Colors.grey.shade100),
+          border: Border.all(color: Colors.grey.shade100),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.03),
@@ -243,24 +286,20 @@ class HomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: isPrimary ? Colors.white.withOpacity(0.2) : color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                icon,
-                size: 32,
-                color: isPrimary ? Colors.white : color,
-              ),
+              child: Icon(icon, size: 28, color: color),
             ),
             const SizedBox(height: 12),
             Text(
               title,
               style: GoogleFonts.inter(
                 fontSize: 14,
-                fontWeight: isPrimary ? FontWeight.w600 : FontWeight.w500,
-                color: isPrimary ? Colors.white : const Color(0xFF374151),
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF374151),
               ),
             ),
           ],

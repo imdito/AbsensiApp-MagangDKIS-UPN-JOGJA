@@ -41,6 +41,7 @@ dependencies:
   http: ^1.6.0
   shared_preferences: ^2.5.4
   geolocator: ^14.0.2
+  local_auth: ^3.0.0
 
 dev_dependencies:
   flutter_test:

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\auth\loginController;
 use App\Http\Controllers\BidangController;
+use App\Http\Controllers\LogsController;
 use App\Http\Controllers\presensiManagement\LaporanController;
 use App\Http\Controllers\presensiManagement\QRController;
 use App\Http\Controllers\userManagement\UserController;
@@ -27,7 +28,7 @@ Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
     Route::get('/presensi/edit/{id}', [PresensiController::class, 'edit'])->name('presensi.edit');
     Route::put('/presensi/update/{id}', [PresensiController::class, 'update'])->name('presensi.update');
     Route::delete('/presensi/delete/{id}', [PresensiController::class, 'destroy'])->name('presensi.delete');
-    Route::get('/presensi/generateQR/{Tipe_QR}', [QRController::class, 'generateQR'])->name('presensi.generateQR');
+    Route::get('/presensi/generateQR/', [QRController::class, 'generateQR'])->name('presensi.generateQR');
 
     //User Management
     Route::get('/tambah-user', [UserController::class, 'index']);
@@ -43,6 +44,9 @@ Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
 
     //Bidang Management
     Route::resource('bidang', BidangController::class);
+    Route::get('/bidang/{id}/detail', [BidangController::class, 'statistik'])->name('bidang.statistik');
+
+    Route::get('/presensi/log', [LogsController::class, 'presensi'])->name('logs.presensi');
 
 });
 
@@ -52,3 +56,4 @@ Route::get('/mobile-only', function () {
 })->name('user.mobile-only')->middleware('auth');
 
 Route::post('/logout', [loginController::class, 'logout'])->name('logout')->middleware('auth');
+

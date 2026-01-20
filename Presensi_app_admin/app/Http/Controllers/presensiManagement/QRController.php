@@ -10,9 +10,8 @@ use Illuminate\Support\Str;
 
 class QRController extends Controller
 {
-    public function generateQR($tipe){
-        $qrAktif = QrToken::where('Tipe_QR', $tipe)
-                    ->where('Expired_at', '>', Carbon::now()->toDateTimeString())
+    public function generateQR(){
+        $qrAktif = QrToken::where('Expired_at', '>', Carbon::now()->toDateTimeString())
                     ->orderBy('Created_at', 'desc')
                     ->first();
 
@@ -26,7 +25,6 @@ class QRController extends Controller
             'Expired_at' => Carbon::now()->addHours(12)->toDateTimeString(),
             'Created_at' => Carbon::now(),
             'Tanggal' => Carbon::now()->toDateString(),
-            'Tipe_QR' => $tipe,
         ]);
 
         return view('app.buatQR', ['qrData' => $qr]);

@@ -30,13 +30,16 @@ class PresensiController extends Controller{
 
     public function create(){
         $users = User::lazy();
-        return view('app.create', ['users' => $users]);
+        $daftar_qr = QrToken::orderBy('Created_at', 'desc')->lazy();
+        return view('app.create', compact('users', 'daftar_qr'));
     }
 
     public function store(Request $request){
         $request->validate([
             'tanggal' => 'required|date',
             'status' => 'required|in:Hadir,Izin,Tidak Hadir',
+            'jam_masuk' => 'required',
+
         ]);
 
         $data = [
@@ -45,8 +48,7 @@ class PresensiController extends Controller{
           'status' => $request->input('status'),
             'jam_masuk' => $request->input('jam_masuk'),
             'jam_pulang' => $request->input('jam_pulang'),
-            'created_at' => now(),
-            'Id_QR' => 1,
+            'Id_QR' => $request->input('Id_QR'),
             'Longitude' => null,
             'Latitude' => null,
         ];
@@ -55,9 +57,10 @@ class PresensiController extends Controller{
     }
 
     public function edit($id){
-        $data_presensi = presensi::find($id);
-        $users = User::all();
-        return view('app.edit', ['presensi' => $data_presensi, 'users' => $users]);
+        $presensi = presensi::find($id);
+        $users = User::lazy();
+        $daftar_qr = QrToken::orderBy('Created_at', 'desc')->lazy();
+        return view('app.edit', compact('presensi', 'users', 'daftar_qr'));
 
     }
 
@@ -65,6 +68,7 @@ class PresensiController extends Controller{
         $request->validate([
             'tanggal' => 'required|date',
             'status' => 'required|string',
+            'jam_masuk' => 'required',
         ]);
 
         $data = [
@@ -78,7 +82,8 @@ class PresensiController extends Controller{
             'Latitude' => $request->input('Latitude'),
         ];
 
-        Presensi::where('id', $id)->update($data);
+        $presensi = presensi::findorFail($id);
+        $presensi->update($data);
         return redirect('/');
     }
 
@@ -97,7 +102,7 @@ class PresensiController extends Controller{
             'Longitude' => 'required',
         ]);
 
-        $jam_absen = now()->format('H:i:s');
+        $jam_absen = now()->toTimeString();
         $tepat_waktu = '14:30:00';
         $batas_absen = '15:00:00';
 
@@ -123,23 +128,15 @@ class PresensiController extends Controller{
         }
 
         try {
-            $tipeAbsen = '';
-            if($validasiToken->Tipe_QR == Tipe_QR::QR_Pulang){
-                $tipeAbsen = 'jam_pulang';
-
-            }else if ($validasiToken->Tipe_QR == Tipe_QR::QR_Masuk){
-                $tipeAbsen = 'jam_masuk';
-            }
-                presensi::create([
-                    'Id_QR' => $validasiToken->Id_QR,
-                    'user_id' => $request->user_id,
-                    'tanggal' => Carbon::now()->toDateString(),
-                    'status' => $status,
-                    $tipeAbsen => Carbon::now()->toDateTimeString(),
-                    'Longitude' => $request->Longitude,
-                    'Latitude' => $request->Latitude,
-                    'created_at' => now(),
-                ]);
+            presensi::create([
+                'Id_QR' => $validasiToken->Id_QR,
+                'user_id' => $request->user_id,
+                'tanggal' => Carbon::now()->toDateString(),
+                'status' => $status,
+                'jam_masuk' => Carbon::now()->toDateTimeString(),
+                'Longitude' => $request->Longitude,
+                'Latitude' => $request->Latitude,
+            ]);
         }catch (Exception $e){
 
             return response()->json([

@@ -19,11 +19,8 @@
 
             {{-- Tombol Aksi --}}
             <div class="mt-4 flex flex-col md:flex-row gap-3 md:mt-0 md:ml-4">
-                <a href="{{ url('/presensi/generateQR/QR_Masuk') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
-                    QR Masuk
-                </a>
-                <a href="{{ url('/presensi/generateQR/QR_Pulang') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
-                    QR Pulang
+                <a href="{{ url('/presensi/generateQR') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                    Lihat QR Apel Pagi
                 </a>
                 <a href="{{ route('presensi') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
                     Input Manual
@@ -51,7 +48,7 @@
                         : 0;
                 @endphp
 
-                <div class="{{ $theme['bg'] }} rounded-xl shadow-lg p-5 text-white transform hover:scale-105 transition duration-300 relative overflow-hidden group">
+                <a href="{{ route('bidang.statistik', $divisi->id_bidang) }}" class="{{ $theme['bg'] }} rounded-xl shadow-lg p-5 text-white transform hover:scale-105 transition duration-300 relative overflow-hidden group">
 
                     <div class="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white opacity-10 group-hover:scale-150 transition-transform duration-500"></div>
 
@@ -83,7 +80,7 @@
                         <span class="text-[10px] text-white/80 font-medium">{{ round($persentase) }}% Lengkap</span>
                     </div>
 
-                </div>
+                </a>
             @endforeach
 
 
@@ -106,7 +103,7 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ASN</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bidang</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jam Kerja</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waktu Presensi</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
@@ -134,15 +131,15 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ $item->tanggal }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 @if($item->jam_masuk != null)
-                                    <span class="text-green-600 font-medium">In: {{ $item->jam_masuk }}</span>
+                                    <span class="text-green-600 font-medium">{{ $item->jam_masuk }}</span>
                                 @else
-                                    <span class="text-red-500 font-medium">Out: {{ $item->jam_pulang }}</span>
+                                    <span class="text-red-500 font-medium"> -- </span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full
-                                {{ ($item->status ?? 'Hadir') == 'Hadir' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                {{ $item->status ?? 'Hadir' }}
+                                {{ ($item->status->value ?? 'Hadir') == 'Hadir' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                {{ $item->status->value ?? 'Hadir' }}
                             </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

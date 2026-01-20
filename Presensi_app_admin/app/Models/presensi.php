@@ -11,8 +11,6 @@ class presensi extends Model
 {
     use hasfactory, softDeletes;
     protected $table = 'presensi';
-    public $timestamps = false;
-
     protected $casts = [
         'status' => Enums::class,
     ];
@@ -25,7 +23,6 @@ class presensi extends Model
         'jam_pulang',
         'Longitude',
         'Latitude',
-      'created_at',
         'created_id',
         'updated_id',
         'deleted_id',
@@ -50,4 +47,23 @@ class presensi extends Model
     public function User(){
         return $this->belongsTo(User::class, 'user_id','user_id'); // menambah foreignkey pada table presensi
     }
+
+    public function creator()
+    {
+        // Relasi ke siapa yang membuat data
+        return $this->belongsTo(User::class, 'created_id')->withTrashed();
+    }
+
+    public function updater()
+    {
+        // Relasi ke siapa yang terakhir mengubah data
+        return $this->belongsTo(User::class, 'updated_id')->withTrashed();
+    }
+
+    public function destroyer()
+    {
+        // Relasi ke siapa yang menghapus data
+        return $this->belongsTo(User::class, 'deleted_id')->withTrashed();
+    }
+
 }

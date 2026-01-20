@@ -8,11 +8,7 @@
         <div class="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md w-full mx-auto border border-gray-200">
 
             <div class="mb-6">
-                <h1 class="text-2xl font-bold text-gray-800">Kode @if($qrData->Tipe_QR == Tipe_QR::QR_Masuk)
-                        Masuk
-                    @elseif($qrData->Tipe_QR == Tipe_QR::QR_Pulang)
-                        Keluar
-                    @endif</h1>
+                <h1 class="text-2xl font-bold text-gray-800">Kode QR Apel Pagi</h1>
                 <p class="text-gray-500 mt-1">{{$qrData['Tanggal']}}</p>
                 <span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full mt-2">
                 Sesi Aktif

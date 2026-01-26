@@ -134,7 +134,9 @@ class HomePage extends StatelessWidget {
                           title: "Riwayat",
                           icon: Icons.history,
                           color: Colors.teal,
-                          onTap: () {},
+                          onTap: () {
+                            controller.goToRiwayat();
+                          },
                         ),
                       ),
 

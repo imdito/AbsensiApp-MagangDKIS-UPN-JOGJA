@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart'; // Import ini untuk handling setting
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../services/location_service.dart';
 import '../services/presensi_api_service.dart';
@@ -32,6 +33,34 @@ class ScanPresensiController extends GetxController {
       isScanning.value = true;
       final code = barcodes.first.rawValue!;
       await _handlePresensiProcess(code, context);
+    }
+  }
+
+  Future<void> ambilDariGaleri(MobileScannerController cameraController) async {
+    try {
+      final ImagePicker picker = ImagePicker();
+
+      // Gunakan ImageSource.gallery
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,);
+
+      if (image != null) {
+        // Jika berhasil ambil gambar, baru dianalisa
+        final BarcodeCapture capture = await cameraController.analyzeImage(image.path) ?? BarcodeCapture(barcodes: []);
+        final List<Barcode> barcodes = capture.barcodes;
+        if (barcodes.isNotEmpty && barcodes.first.rawValue != null) {
+          isScanning.value = true;
+          final code = barcodes.first.rawValue!;
+          print("QR Code dari Galeri: $code");
+          await _handlePresensiProcess(code, Get.context!);
+        } else {
+          Get.snackbar("Gagal", "Tidak ada QR code terdeteksi di gambar.");
+        }
+
+      }
+    } catch (e) {
+      print("Error ambil gambar: $e");
+      Get.snackbar("Gagal", "Tidak bisa mengambil gambar dari galeri: $e");
     }
   }
 

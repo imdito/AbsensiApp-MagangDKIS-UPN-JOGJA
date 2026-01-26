@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../controller/scan_presensi_controller.dart';
-import '../utils/notif_presensi.dart';
+// import '../utils/notif_presensi.dart'; // Sesuaikan import Anda
 
 class ScanPresensiView extends StatelessWidget {
   const ScanPresensiView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Controller bawaan dari library untuk mengatur flash/kamera
     final MobileScannerController cameraController = MobileScannerController();
     final controller = Get.put(ScanPresensiController());
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -26,21 +26,21 @@ class ScanPresensiView extends StatelessWidget {
           IconButton(
             color: Colors.white,
             icon: ValueListenableBuilder(
-              valueListenable: controller.cameraController,
+              valueListenable: cameraController,
               builder: (context, state, child) {
                 switch (state.torchState) {
                   case TorchState.off:
                     return const Icon(Icons.flash_off, color: Colors.grey);
                   case TorchState.on:
                     return const Icon(Icons.flash_on, color: Colors.yellow);
-                  case TorchState.auto: // Tambahan: mode auto (jika ada)
+                  case TorchState.auto:
                     return const Icon(Icons.flash_auto, color: Colors.white);
-                  case TorchState.unavailable: // Tambahan: jika HP tidak punya flash
+                  case TorchState.unavailable:
                     return const Icon(Icons.no_flash, color: Colors.grey);
                 }
               },
             ),
-            onPressed: () => controller.toggleFlash(),
+            onPressed: () => cameraController.toggleTorch(),
           ),
         ],
       ),
@@ -69,14 +69,14 @@ class ScanPresensiView extends StatelessWidget {
                     backgroundBlendMode: BlendMode.dstOut,
                   ),
                 ),
-                // Lubang Kotak di tengah (Area Scan)
+                // Lubang Kotak di tengah
                 Align(
                   alignment: Alignment.center,
                   child: Container(
                     height: 280,
                     width: 280,
                     decoration: BoxDecoration(
-                      color: Colors.red, // Warna ini akan menjadi transparan karena srcOut
+                      color: Colors.red,
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
@@ -85,23 +85,22 @@ class ScanPresensiView extends StatelessWidget {
             ),
           ),
 
-          // LAPISAN 3: Border Putih & Teks (Hiasan)
+          // LAPISAN 3: Border Putih (Hiasan)
           Align(
             alignment: Alignment.center,
             child: Container(
               height: 280,
               width: 280,
               decoration: BoxDecoration(
-                // Border garis putih di sekeliling kotak scan
                 border: Border.all(color: Colors.white, width: 3),
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
           ),
 
-          // Teks Instruksi di bawah kotak
+          // Teks Instruksi
           Positioned(
-            bottom: 100,
+            bottom: 120,
             left: 0,
             right: 0,
             child: Column(
@@ -117,12 +116,45 @@ class ScanPresensiView extends StatelessWidget {
                 const SizedBox(height: 8),
                 const Text(
                   "Scanning...",
-                  style: TextStyle(
-                    color: Colors.blueAccent,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.blueAccent, fontSize: 14),
                 ),
               ],
+            ),
+          ),
+
+          // LAPISAN 4: Tombol Ambil dari Galeri (FITUR BARU)
+          Positioned(
+            bottom: 40,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: InkWell(
+                // KITA PASSING cameraController KE SINI
+                onTap: () => controller.ambilDariGaleri(cameraController),
+                borderRadius: BorderRadius.circular(30),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2), // Efek kaca
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(color: Colors.white.withOpacity(0.5)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.photo_library, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text(
+                        "Ambil QR dari Galeri",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         ],

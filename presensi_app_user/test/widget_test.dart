@@ -1,30 +1,22 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:presensi_app_user/view/scan_presensi_view.dart';
+// Ganti import ini sesuai nama package aplikasi Anda
+import 'package:presensi_app_user/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
+  testWidgets('Cek apakah aplikasi bisa dibuka', (WidgetTester tester) async {
+    // 1. Build aplikasi Anda
     await tester.pumpWidget(const MyApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // 2. Cek apakah ada Widget tertentu di layar awal (Misal teks 'Login' atau Gambar Logo)
+    // Sesuaikan 'Login' dengan teks yang BENAR-BENAR ada di halaman awal Anda
+    find.text('Masuk Aplikasi'); //artinya mencari widget Text yang isinya "Login"
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // Contoh: Jika di halaman awal ada tulisan "Presensi App"
+    // expect(find.text('Presensi App'), findsOneWidget);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Atau cek apakah ada setidaknya satu widget Scaffold (tanda halaman termuat)
+    expect(find.byType(Scaffold), findsOneWidget);
   });
-}
+} 

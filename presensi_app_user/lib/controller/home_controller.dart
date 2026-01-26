@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/biometrik_auth.dart';
 import '../view/auth/login_page.dart';
+import '../view/riwayat_view.dart';
 
 class HomeController extends GetxController {
 
@@ -30,6 +31,13 @@ class HomeController extends GetxController {
     }else{
       Get.snackbar('Error', 'Biometrik tidak ditemukan');
     }
+  }
+
+
+  void goToRiwayat() {
+   Get.to(() => RiwayatView(), arguments:{
+      'user_id': user.id,
+   });
   }
 
   void goToEditProfile() {

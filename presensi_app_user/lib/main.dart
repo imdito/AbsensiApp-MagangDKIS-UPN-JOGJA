@@ -1,14 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
-import 'package:presensi_app_user/view/auth/login_page.dart';
 import 'package:presensi_app_user/view/auth/splash_page.dart';
-import 'package:presensi_app_user/view/scan_presensi_view.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
  await dotenv.load(fileName: ".env");
-  runApp(const MyApp());
+ await initializeDateFormatting('id_ID', null);
+ runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

@@ -3,7 +3,7 @@
 @section('title', 'Cetak Laporan Presensi')
 
 @section('content')
-    <div class="max-w-6xl mx-auto px-4">
+    <div class="max-w-7xl mx-auto px-4"> {{-- Container diperlebar sedikit jadi max-w-7xl agar muat --}}
 
         <div class="grid grid-cols-1 gap-6">
 
@@ -16,17 +16,30 @@
                 <form action="{{ route('laporan.print') }}" method="POST" target="pdf_preview">
                     @csrf
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
                         <div>
                             <label class="block text-gray-700 text-sm font-bold mb-2">NIP ASN</label>
-                            <input type="text" name="nip" class="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring focus:border-indigo-300" placeholder="Opsional...">
+                            <input type="text" name="nip" class="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring focus:border-indigo-300" placeholder="Cari NIP...">
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Bidang</label>
+                            <select name="id_bidang" class="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring focus:border-indigo-300 bg-white">
+                                <option value="">-- Semua Bidang --</option>
+                                @if(isset($daftar_bidang))
+                                    @foreach($daftar_bidang as $bidang)
+                                        <option value="{{ $bidang->id_bidang }}">{{ $bidang->nama_bidang }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
                         </div>
 
                         <div class="md:col-span-2">
                             <label class="block text-gray-700 text-sm font-bold mb-2">Rentang Waktu</label>
                             <div class="flex space-x-2">
                                 <input type="date" name="start_date" class="w-1/2 px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring focus:border-indigo-300">
-                                <span class="self-center text-gray-400">-</span>
+                                <span class="self-center text-gray-400 font-bold">-</span>
                                 <input type="date" name="end_date" class="w-1/2 px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring focus:border-indigo-300">
                             </div>
                         </div>
@@ -61,7 +74,6 @@
                     <iframe name="pdf_preview" class="w-full h-full border-0" style="height: 800px" title="PDF Preview">
                         <p class="text-center p-10 text-gray-500">Browser Anda tidak mendukung iFrame.</p>
                     </iframe>
-
                     <div class="absolute inset-0 flex items-center justify-center -z-0 pointer-events-none">
                         <p class="text-gray-400 font-medium">Hasil PDF akan muncul di sini...</p>
                     </div>
@@ -70,17 +82,18 @@
 
         </div>
     </div>
+
     <script>
-        //skrip menghapus placeholder teks saat iframe terisi
         const iframe = document.querySelector('iframe[name="pdf_preview"]');
         iframe.addEventListener('load', () => {
             const placeholder = iframe.parentElement.querySelector('div.absolute');
-            if (iframe.contentDocument.body.innerHTML.trim() !== '') {
+            try {
+                if (iframe.contentDocument && iframe.contentDocument.body.innerHTML.trim() !== '') {
+                    placeholder.style.display = 'none';
+                }
+            } catch(e) {
                 placeholder.style.display = 'none';
-            } else {
-                placeholder.style.display = 'flex';
             }
         });
     </script>
-
 @endsection

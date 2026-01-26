@@ -6,27 +6,81 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-        {{-- HEADER & NAVIGASI --}}
-        <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        {{-- HEADER & NAVIGASI & FILTER TANGGAL --}}
+        <div class="mb-8 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
+
+            {{-- Kiri: Tombol Back & Judul --}}
             <div class="flex items-center gap-4">
-                <a href="{{ url('/') }}" class="bg-white border border-gray-300 p-2.5 rounded-full hover:bg-gray-50 text-gray-600 transition shadow-sm" title="Kembali ke Dashboard">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <a href="{{ url('/') }}" class="bg-white border border-gray-300 p-2.5 rounded-full hover:bg-gray-50 text-gray-600 transition shadow-sm group" title="Kembali ke Dashboard">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                 </a>
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900">Bidang {{ $bidang->nama_bidang }}</h1>
-                    <p class="text-sm text-gray-500">Detail kehadiran anggota tanggal <span class="font-semibold text-indigo-600">{{ $hariIni->translatedFormat('d F Y') }}</span></p>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-sm text-gray-500">Kode: <span class="font-mono font-medium text-gray-700">{{ $bidang->kode_bidang }}</span></span>
+                    </div>
                 </div>
             </div>
 
-            {{-- Badge Kode Bidang --}}
-            <div class="flex items-center">
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
-                Kode: {{ $bidang->kode_bidang }}
-            </span>
+            {{-- Kanan: Filter Tanggal --}}
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <span class="text-sm font-medium text-gray-500 hidden sm:block">Pilih Tanggal:</span>
+
+                <div class="bg-white p-1 rounded-lg border border-gray-300 shadow-sm flex items-center">
+                    {{-- Tombol Hari Sebelumnya --}}
+                    <a href="{{ url()->current() . '?tanggal=' . $hariIni->copy()->subDay()->format('Y-m-d') }}"
+                       class="p-2 rounded-md hover:bg-gray-100 text-gray-600 transition"
+                       title="Hari Sebelumnya">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </a>
+
+                    {{-- Input Date Picker --}}
+                    <form action="{{ url()->current() }}" method="GET" class="flex items-center">
+                        <input type="date"
+                               name="tanggal"
+                               value="{{ $hariIni->format('Y-m-d') }}"
+                               onchange="this.form.submit()"
+                               class="border-0 focus:ring-0 text-gray-800 font-semibold text-sm py-2 px-2 cursor-pointer bg-transparent w-full sm:w-auto">
+                    </form>
+
+                    {{-- Disable jika tanggal adalah hari ini (opsional, hapus logic @if jika ingin bebas) --}}
+                    @if($hariIni->format('Y-m-d') < now()->format('Y-m-d'))
+                        <a href="{{ url()->current() . '?tanggal=' . $hariIni->copy()->addDay()->format('Y-m-d') }}"
+                           class="p-2 rounded-md hover:bg-gray-100 text-gray-600 transition"
+                           title="Hari Selanjutnya">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </a>
+                    @else
+                        <span class="p-2 rounded-md text-gray-300 cursor-not-allowed">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </span>
+                    @endif
+                </div>
+
+                {{-- Tombol Reset ke Hari Ini (muncul jika tanggal bukan hari ini) --}}
+                @if(!$hariIni->isToday())
+                    <a href="{{ url()->current() }}" class="text-xs font-medium text-indigo-600 hover:text-indigo-800 underline">
+                        Hari Ini
+                    </a>
+                @endif
             </div>
         </div>
+
+{{--            --}}{{-- Badge Kode Bidang --}}
+{{--            <div class="flex items-center">--}}
+{{--            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">--}}
+{{--                Kode: {{ $bidang->kode_bidang }}--}}
+{{--            </span>--}}
+{{--            </div>--}}
+{{--        </div>--}}
 
         {{-- STATISTIK SUMMARY CARD --}}
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\presensiManagement;
 use App\Http\Controllers\Controller;
 use App\Models\QrToken;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class QRController extends Controller
@@ -29,4 +28,11 @@ class QRController extends Controller
 
         return view('app.buatQR', ['qrData' => $qr]);
     }
+
+    public function lihatQR(){
+        $todayQR = QrToken::whereDate('created_at', Carbon::today())->first();
+
+        return view('frontliner.index', compact('todayQR'));
+    }
+
 }

@@ -1,32 +1,15 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Enums\Tipe_QR;
 use App\Models\Bidang;
 use App\Models\presensi;
 use App\Models\QrToken;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use mysql_xdevapi\Exception;
 
 class PresensiController extends Controller{
-    public function index()
-    {
-        $daftar_presensi = Presensi::with(['user.bidang'])->orderBy('tanggal', 'desc')->get();
-
-        $rekap_divisi = Bidang::withCount([
-            'users as total_anggota',
-            'users as jumlah_hadir' => function($query) {
-                $query->whereHas('presensi', function($q) {
-                    $q->whereDate('tanggal', date('Y-m-d'))
-                        ->whereIn('status', ['Hadir', 'Telat']);
-                });
-            }
-        ])->get();
-        return view('app.index', compact('daftar_presensi', 'rekap_divisi'));
-    }
 
     public function create(){
         $users = User::lazy();
@@ -84,13 +67,6 @@ class PresensiController extends Controller{
 
         $presensi = presensi::findorFail($id);
         $presensi->update($data);
-        return redirect('/');
-    }
-
-    public function destroy($id)
-    {
-        $data = presensi::find($id);
-        $data->delete();
         return redirect('/');
     }
 

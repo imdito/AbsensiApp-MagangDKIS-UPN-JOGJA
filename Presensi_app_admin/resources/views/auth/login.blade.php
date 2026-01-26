@@ -24,10 +24,7 @@
                 </svg>
             </div>
         </div>
-        <h2 class="text-4xl font-bold tracking-tight mb-4">Sistem Presensi Digital</h2>
-        <p class="text-blue-100 text-lg max-w-md mx-auto leading-relaxed">
-            Kelola kehadiran, izin, dan produktivitas tim Anda dalam satu platform yang terintegrasi dan efisien.
-        </p>
+        <h2 class="text-4xl font-bold tracking-tight mb-4">Sistem Presensi Apel Pagi</h2>
     </div>
 
     <div class="absolute -bottom-10 -left-10 w-64 h-64 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>

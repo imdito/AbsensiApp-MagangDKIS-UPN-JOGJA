@@ -25,6 +25,9 @@
                 <a href="{{ route('presensi') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
                     Input Manual
                 </a>
+                <a href="{{ route('logs.presensi') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700">
+                    Lihat log aktivitas Presensi
+                </a>
             </div>
         </div>
 
@@ -145,10 +148,6 @@
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex justify-end items-center gap-2">
                                     <a href="{{ url('/presensi/edit/' . $item->id) }}" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 p-2 rounded-lg">Edit</a>
-                                    <form action="{{ url('/presensi/delete', ['id' => $item->id]) }}" method="post" onsubmit="return confirm('Hapus?');">
-                                        @method('DELETE') @csrf
-                                        <button type="submit" class="text-red-600 hover:text-red-900 bg-red-50 p-2 rounded-lg">Hapus</button>
-                                    </form>
                                 </div>
                             </td>
                         </tr>

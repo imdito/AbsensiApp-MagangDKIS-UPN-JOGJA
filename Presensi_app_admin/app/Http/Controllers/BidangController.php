@@ -71,45 +71,7 @@ class BidangController extends Controller
         return redirect()->route('bidang.index')->with('success', 'Data Berhasil Dihapus');
     }
 
-    public function statistik($id){
-        // 1. Ambil Data Bidang
-        $bidang = Bidang::findOrFail($id);
 
-        $hariIni = Carbon::today();
-
-        // 2. Ambil Daftar Pegawai di Bidang ini + Status Presensi Hari Ini
-        $karyawan = User::where('id_bidang', $id)
-            ->with(['presensi' => function($q) use ($hariIni) {
-                // Kita hanya butuh data presensi HARI INI
-                $q->whereDate('tanggal', $hariIni);
-            }])
-            ->orderBy('Nama_Pengguna', 'asc')
-            ->get();
-
-        // 3. Hitung Statistik Sederhana untuk Bidang Ini
-        $total_pegawai = $karyawan->count();
-        $hadir = 0;
-        $telat = 0;
-        $izin  = 0;
-
-        foreach($karyawan as $k) {
-            $p = $k->presensi->first(); // Data presensi hari ini (jika ada)
-
-            if($p) {
-                if($p->status->value == 'Hadir') $hadir++;
-                if($p->status->value == 'Izin' || $p->status == 'Sakit') $izin++;
-                if($p->status->value == 'Telat') $telat++;
-            }
-        }
-
-        $belum_hadir = $total_pegawai - ($hadir + $izin);
-
-        // 4. Kirim ke View
-        return view('app.statistik.index', compact(
-            'bidang', 'karyawan', 'hariIni',
-            'total_pegawai', 'hadir', 'telat', 'izin', 'belum_hadir'
-        ));
-    }
 
 
 }

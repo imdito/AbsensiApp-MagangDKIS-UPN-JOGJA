@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -89,4 +88,23 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Bidang::class, 'id_bidang', 'id_bidang');
     }
+
+    public function creator()
+    {
+        // Relasi ke siapa yang membuat data
+        return $this->belongsTo(User::class, 'created_id')->withTrashed();
+    }
+
+    public function updater()
+    {
+        // Relasi ke siapa yang terakhir mengubah data
+        return $this->belongsTo(User::class, 'updated_id')->withTrashed();
+    }
+
+    public function destroyer()
+    {
+        // Relasi ke siapa yang menghapus data
+        return $this->belongsTo(User::class, 'deleted_id')->withTrashed();
+    }
+
 }

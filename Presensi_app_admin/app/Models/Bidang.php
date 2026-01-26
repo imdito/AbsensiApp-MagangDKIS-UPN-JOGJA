@@ -15,9 +15,6 @@ class Bidang extends Model
     // Beritahu nama primary key barunya
     protected $primaryKey = 'id_bidang';
 
-    // Jika tidak menggunakan created_at/updated_at default Laravel
-    public $timestamps = false;
-
     protected $fillable = [
         'kode_bidang',
         'nama_bidang',
@@ -44,4 +41,23 @@ class Bidang extends Model
     {
         return $this->hasMany(User::class, 'id_bidang', 'id_bidang');
     }
+
+    public function creator()
+    {
+        // Relasi ke siapa yang membuat data
+        return $this->belongsTo(User::class, 'created_id')->withTrashed();
+    }
+
+    public function updater()
+    {
+        // Relasi ke siapa yang terakhir mengubah data
+        return $this->belongsTo(User::class, 'updated_id')->withTrashed();
+    }
+
+    public function destroyer()
+    {
+        // Relasi ke siapa yang menghapus data
+        return $this->belongsTo(User::class, 'deleted_id')->withTrashed();
+    }
+
 }

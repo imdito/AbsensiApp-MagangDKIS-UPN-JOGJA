@@ -3,51 +3,45 @@
 namespace App\Http\Controllers\presensiManagement;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bidang;
 use Illuminate\Http\Request;
-use App\Models\presensi; // Ganti dengan Model Anda
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Http\Services\StatistikServices; // Import Service
 
 class LaporanController extends Controller
 {
-    // Menampilkan Halaman Form Filter
+    // Tampilkan Halaman Form
     public function index()
     {
-        return view('app.laporan.index');
+        $daftar_bidang = Bidang::all();
+        return view('app.laporan.index', compact('daftar_bidang'));
     }
 
     // Logic Mencetak PDF
-    public function print(Request $request)
+    public function print(Request $request, StatistikServices $statistikService)
     {
+        // 1. Validasi
         $request->validate([
             'start_date' => 'nullable|date',
             'end_date'   => 'nullable|date|after_or_equal:start_date',
             'nip'        => 'nullable|string',
+            'id_bidang'  => 'nullable',
         ]);
 
-        // Mulai Query
-        $query = Presensi::query();
+        // 2. Panggil Service untuk ambil data matang
+        $data = $statistikService->getLaporanData(
+            $request->nip,
+            $request->start_date,
+            $request->end_date,
+            $request->id_bidang
+        );
 
-        // Filter berdasarkan NIP jika diisi
-        if ($request->filled('nip')) {
-            $query->join('users', 'presensi.user_id', '=', 'users.user_id')
-                  ->where('users.NIP', $request->nip);
-        }
-
-        // Filter berdasarkan Rentang Waktu jika diisi
-        if ($request->filled('start_date') && $request->filled('end_date')) {
-            $query->whereBetween('tanggal', [$request->start_date, $request->end_date]);
-        }
-
-        $data = $query->get();
-
-        // Load View PDF dengan data
+        // 3. Cetak PDF
         $pdf = Pdf::loadView('app.laporan.pdf', [
             'data' => $data,
-            'info' => $request->all() // Mengirim info filter ke view untuk judul
+            'info' => $request->all() // Mengirim input filter untuk judul laporan
         ]);
 
-        // Stream (tampilkan di browser) atau Download
-        // 'stream' membiarkan user melihat dulu, 'download' langsung unduh file
         return $pdf->stream('laporan-karyawan.pdf');
     }
 }

@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
     public function index(){
-        $daftar_divisi = Bidang::all();
+        $daftar_divisi = Bidang::tenanted()->lazy();
         return view('userManagement.tambahuser', ['daftar_divisi' => $daftar_divisi]);
     }
 
@@ -37,7 +37,7 @@ class UserController extends Controller
 
     public function listUsers()
     {
-        $karyawan = User::lazy();
+        $karyawan = User::with('bidang')->tenanted()->lazy();
         return view('userManagement.indexUser', ['karyawan' => $karyawan]);
     }
 
@@ -74,8 +74,8 @@ class UserController extends Controller
     }
 
     public function editPage($id){
-        $user = User::find($id);
-        $daftar_bidang = Bidang::all();
+        $user = User::tenanted()->findOrFail($id);
+        $daftar_bidang = Bidang::tenanted()->lazy();
         return view('userManagement.updateUser', ['user' => $user, 'daftar_divisi' => $daftar_bidang]);
     }
 

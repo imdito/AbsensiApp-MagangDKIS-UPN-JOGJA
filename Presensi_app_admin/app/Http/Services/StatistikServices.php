@@ -4,7 +4,7 @@ namespace App\Http\Services;
 
 use App\Enums\Enums;
 use App\Models\User;
-use App\Models\presensi;
+use App\Models\Presensi;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Collection;
 
@@ -14,7 +14,7 @@ class StatistikServices{
         // 1. Cek User jika NIP diisi
         $user = null;
         if ($nip) {
-            $user = User::where('NIP', $nip)->first();
+            $user = User::tenanted()->where('NIP', $nip)->first();
 
             // Jika NIP diisi tapi User tidak ketemu, kembalikan collection kosong
             if (!$user) {
@@ -23,7 +23,7 @@ class StatistikServices{
         }
 
         // 2. Base Query
-        $query = presensi::query();
+        $query = Presensi::query()->tenanted();
 
         if ($user) {
             $query->where('user_id', $user->user_id);
@@ -43,7 +43,6 @@ class StatistikServices{
         // 4. Logic Data (Looping CarbonPeriod)
         if ($user && $startDate && $endDate) {
 
-            // Ambil data DB & key by tanggal agar mudah dicari
             $dbData = $query->get()->keyBy(function($item) {
                 return $item->tanggal; // Pastikan format di DB Y-m-d, atau gunakan carbon format
             });
@@ -58,13 +57,11 @@ class StatistikServices{
                     $finalData->push($dbData[$dateStr]);
                 } else {
                     // Jika data tidak ada (Bolong), buat Dummy Object
-                    $dummy = new presensi();
+                    $dummy = new Presensi();
                     $dummy->user = $user; // Attach object user
                     $dummy->tanggal = $dateStr;
                     $dummy->status = Enums::TidakHadir;
                     $dummy->jam_masuk = '-';
-
-                    // Tambahkan field lain jika view memerlukannya (misal id, lokasi, dll)
 
                     $finalData->push($dummy);
                 }
@@ -73,7 +70,6 @@ class StatistikServices{
             return $finalData;
 
         } else {
-            // Jika bukan mode detail per user (Laporan Umum), ambil raw data saja
             return $query->with('user')->get();
         }
     }
@@ -82,7 +78,7 @@ class StatistikServices{
     public function getStatistikHarian($bidangId, $tanggal)
     {
         // 1. Ambil Data Karyawan & Presensi Hari Itu
-        $karyawan = User::where('id_bidang', $bidangId)
+        $karyawan = User::tenanted()->where('id_bidang', $bidangId)
             ->with(['presensi' => function($q) use ($tanggal) {
                 $q->whereDate('tanggal', $tanggal);
             }])
@@ -110,7 +106,6 @@ class StatistikServices{
 
         $stats['belum_hadir'] = $stats['total_pegawai'] - ($stats['hadir'] + $stats['izin'] + $stats['telat']); // Atau sesuaikan rumus
 
-        // Kembalikan paket data lengkap
         return [
             'karyawan' => $karyawan,
             'statistik' => $stats

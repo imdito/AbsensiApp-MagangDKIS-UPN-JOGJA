@@ -1,8 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\Bidang;
-use App\Models\presensi;
+use App\Models\Presensi;
 use App\Models\QrToken;
 use App\Models\User;
 use Carbon\Carbon;
@@ -40,8 +39,8 @@ class PresensiController extends Controller{
     }
 
     public function edit($id){
-        $presensi = presensi::find($id);
-        $users = User::lazy();
+        $presensi = Presensi::tenanted()->find($id);
+        $users = User::tenanted()->lazy();
         $daftar_qr = QrToken::orderBy('Created_at', 'desc')->lazy();
         return view('app.edit', compact('presensi', 'users', 'daftar_qr'));
 
@@ -65,7 +64,7 @@ class PresensiController extends Controller{
             'Latitude' => $request->input('Latitude'),
         ];
 
-        $presensi = presensi::findorFail($id);
+        $presensi = Presensi::tenanted()->findorFail($id);
         $presensi->update($data);
         return redirect('/');
     }
@@ -80,12 +79,12 @@ class PresensiController extends Controller{
 
         $jam_absen = now()->toTimeString();
         $tepat_waktu = '14:30:00';
-        $batas_absen = '15:00:00';
+        $batas_absen = '16:00:00';
 
         $status = 'Hadir';
         if($jam_absen > $tepat_waktu && $jam_absen <= $batas_absen){
-            $status = 'Telat';
-        }else if($jam_absen > $batas_absen){
+            $status = 'Izin';
+        }elseif($jam_absen > $batas_absen){
             $status = 'Tidak Hadir';
             return response()->json([
                 'status' => 'error',
@@ -104,7 +103,7 @@ class PresensiController extends Controller{
         }
 
         try {
-            presensi::create([
+            Presensi::create([
                 'Id_QR' => $validasiToken->Id_QR,
                 'user_id' => $request->user_id,
                 'tanggal' => Carbon::now()->toDateString(),

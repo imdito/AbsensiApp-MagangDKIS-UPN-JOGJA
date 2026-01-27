@@ -13,7 +13,7 @@ class LaporanController extends Controller
     // Tampilkan Halaman Form
     public function index()
     {
-        $daftar_bidang = Bidang::all();
+        $daftar_bidang = Bidang::tenanted()->lazy();
         return view('app.laporan.index', compact('daftar_bidang'));
     }
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use DateTimeInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -80,7 +81,13 @@ class User extends Authenticatable
     }
 
     public function presensi(){
-        return $this->hasMany(presensi::class, 'user_id', 'user_id');
+        return $this->hasMany(Presensi::class, 'user_id', 'user_id');
+    }
+
+    public function getSkpdIdAttribute()
+    {
+        // Cek dulu user punya bidang atau tidak (takutnya super admin NULL)
+        return $this->bidang ? $this->bidang->id_skpd : null;
     }
 
 // Di Model User.php
@@ -105,6 +112,27 @@ class User extends Authenticatable
     {
         // Relasi ke siapa yang menghapus data
         return $this->belongsTo(User::class, 'deleted_id')->withTrashed();
+    }
+
+
+
+    public function scopeTenanted(Builder $query)
+    {
+        $user = auth()->user();
+
+        if ($user->role === 'super_admin') {
+            return $query;
+        }
+
+        $skpdIdAdmin = $user->bidang->id_skpd ?? null;
+
+        if ($skpdIdAdmin) {
+            return $query->whereHas('bidang', function($q) use ($skpdIdAdmin) {
+                $q->where('id_skpd', $skpdIdAdmin);
+            });
+        }
+
+        return $query->where('id', 0);
     }
 
 }

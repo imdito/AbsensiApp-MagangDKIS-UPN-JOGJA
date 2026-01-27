@@ -5,7 +5,9 @@ namespace App\Http\Controllers\presensiManagement;
 use App\Http\Controllers\Controller;
 use App\Http\Services\StatistikServices;
 use App\Models\Bidang;
-use App\Models\presensi;
+use App\Models\Presensi;
+use App\Models\Skpd;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -13,9 +15,9 @@ class StatistikController extends Controller
 {
     public function index()
     {
-        $daftar_presensi = Presensi::with(['user.bidang'])->orderBy('tanggal', 'desc')->get();
+        $daftar_presensi = Presensi::tenanted()->with(['user.bidang'])->orderBy('tanggal', 'desc')->get();
 
-        $rekap_divisi = Bidang::withCount([
+        $rekap_divisi = Bidang::tenanted()->withCount([
             'users as total_anggota',
             'users as jumlah_hadir' => function($query) {
                 $query->whereHas('presensi', function($q) {
@@ -25,6 +27,26 @@ class StatistikController extends Controller
             }
         ])->get();
         return view('app.index', compact('daftar_presensi', 'rekap_divisi'));
+    }
+
+    public function superAdmin()
+    {
+        $data = [
+            'total_skpd'    => Skpd::count(),
+            'total_bidang'  => Bidang::count(),
+            'total_admin'   => User::where('Jabatan', 'admin')->count(),
+            'total_pegawai' => User::count(),
+
+            // Grafik: Jumlah Bidang per SKPD
+            'chart_skpd'    => Bidang::selectRaw('id_skpd, COUNT(*) as total_bidang')
+                                    ->groupBy('id_skpd')
+                                    ->with('skpd')
+                                    ->get(),
+
+            'recent_skpds'  => Skpd::latest()->take(5)->get(),
+        ];
+
+        return view('superAdmin.index', $data);
     }
 
     public function statistik(Request $request, $id, StatistikServices $service)
@@ -51,7 +73,7 @@ class StatistikController extends Controller
     }
 
     public function riwayatPresensi($id){
-        $data_presensi = presensi::where('user_id', $id)
+        $data_presensi = Presensi::where('user_id', $id)
             ->orderBy('tanggal', 'desc')
             ->get();
 

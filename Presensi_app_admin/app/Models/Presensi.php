@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use App\Enums\Enums;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class presensi extends Model
+class Presensi extends Model
 {
     use hasfactory, softDeletes;
     protected $table = 'presensi';
@@ -64,6 +65,25 @@ class presensi extends Model
     {
         // Relasi ke siapa yang menghapus data
         return $this->belongsTo(User::class, 'deleted_id')->withTrashed();
+    }
+
+    public function scopeTenanted(Builder $query)
+    {
+        $user = auth()->user();
+
+        if ($user->role === 'super_admin') {
+            return $query;
+        }
+
+        $skpdIdAdmin = $user->bidang->id_skpd ?? null;
+
+        if ($skpdIdAdmin) {
+            return $query->whereHas('user.bidang', function($q) use ($skpdIdAdmin) {
+                $q->where('id_skpd', $skpdIdAdmin);
+            });
+        }
+
+        return $query->where('id', 0);
     }
 
 }

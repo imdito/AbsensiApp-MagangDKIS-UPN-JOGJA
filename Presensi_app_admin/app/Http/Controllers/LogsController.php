@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bidang;
-use App\Models\presensi;
+use App\Models\Presensi;
 use App\Models\QrToken;
 use App\Models\User;
 
@@ -11,7 +11,7 @@ class LogsController extends Controller
 {
     public function presensi()
     {
-        $logs = presensi::withTrashed()
+        $logs = Presensi::tenanted()->withTrashed()
             ->with(['user', 'creator', 'updater', 'destroyer'])
             ->latest()
             ->paginate(8);
@@ -21,7 +21,7 @@ class LogsController extends Controller
 
     public function pegawai()
     {
-        $logs = User::withTrashed()
+        $logs = User::tenanted()->withTrashed()
             ->with(['creator', 'updater', 'destroyer'])
             ->latest()
             ->paginate(10);
@@ -31,7 +31,7 @@ class LogsController extends Controller
 
     public function bidang()
     {
-        $logs = Bidang::withTrashed()
+        $logs = Bidang::tenanted()->withTrashed()
             ->with(['creator', 'updater', 'destroyer'])
             ->latest()
             ->paginate(4);

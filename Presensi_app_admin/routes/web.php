@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\auth\loginController;
+use App\Http\Controllers\auth\LoginController;
 use App\Http\Controllers\BidangController;
 use App\Http\Controllers\LogsController;
 use App\Http\Controllers\presensiManagement\LaporanController;
@@ -12,8 +12,8 @@ use App\Http\Controllers\PresensiController;
 
 
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [loginController::class, 'index'])->name('login');
-    Route::post('/login', [loginController::class, 'authenticate'])->name('login.post');
+    Route::get('/login', [LoginController::class, 'index'])->name('login');
+    Route::post('/login', [LoginController::class, 'authenticate'])->name('login.post');
 
 });
 
@@ -21,6 +21,9 @@ Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
 
     Route::get('/', [StatistikController::class, 'index'])->name('home');
 
+    //Super Admin nanti bakal dipindah
+    Route::get('/Super-Admin', [StatistikController::class, 'superAdmin'])->name('dashboard.super_admin');
+    Route::resource('skpd', App\Http\Controllers\SkpdController::class);
     //auth logout
 
     //Presensi
@@ -59,5 +62,5 @@ Route::get('/mobile-only', function () {
     return view('mobileOnly');
 })->name('user.mobile-only')->middleware('auth');
 
-Route::post('/logout', [loginController::class, 'logout'])->name('logout')->middleware('auth');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 

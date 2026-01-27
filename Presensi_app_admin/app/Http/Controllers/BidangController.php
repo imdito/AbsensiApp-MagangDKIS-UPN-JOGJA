@@ -12,7 +12,7 @@ class BidangController extends Controller
     // 1. TAMPILKAN DATA (READ)
     public function index()
     {
-        $bidang = Bidang::orderBy('nama_bidang', 'asc')->get();
+        $bidang = Bidang::orderBy('nama_bidang', 'asc')->tenanted()->lazy();
         return view('manajemenBidang.index', compact('bidang'));
     }
 
@@ -38,7 +38,7 @@ class BidangController extends Controller
     // 4. FORM EDIT (EDIT)
     public function edit($id)
     {
-        $bidang = Bidang::findOrFail($id);
+        $bidang = Bidang::tenanted()->findOrFail($id);
         return view('manajemenBidang.edit', compact('bidang'));
     }
 
@@ -56,7 +56,7 @@ class BidangController extends Controller
             'nama_bidang' => $request->input('nama_bidang'),
         ];
 
-        $bidang = Bidang::findOrFail($id);
+        $bidang = Bidang::tenanted()->findOrFail($id);
         $bidang->update($data);
 
         return redirect()->route('bidang.index')->with('success', 'Data Berhasil Diupdate');
@@ -65,7 +65,7 @@ class BidangController extends Controller
     // 6. HAPUS DATA (DELETE)
     public function destroy($id)
     {
-        $bidang = Bidang::findOrFail($id);
+        $bidang = Bidang::tenanted()->findOrFail($id);
         $bidang->delete();
 
         return redirect()->route('bidang.index')->with('success', 'Data Berhasil Dihapus');

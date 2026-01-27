@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Bidang extends Model
@@ -18,6 +20,8 @@ class Bidang extends Model
     protected $fillable = [
         'kode_bidang',
         'nama_bidang',
+        'id_skpd',
+
     ];
 
     protected $dates = ['deleted_at'];
@@ -34,6 +38,11 @@ class Bidang extends Model
             $model->deleted_id = auth()->id();
             $model->save();
         });
+    }
+
+    public function skpd(): BelongsTo
+    {
+        return $this->belongsTo(Skpd::class, 'skpd_id');
     }
 
     // Relasi ke User (Satu bidang punya banyak user)
@@ -58,6 +67,29 @@ class Bidang extends Model
     {
         // Relasi ke siapa yang menghapus data
         return $this->belongsTo(User::class, 'deleted_id')->withTrashed();
+    }
+
+
+    public function scopeTenanted($query)
+    {
+        $user = auth()->user();
+
+        // 1. Super Admin melihat semuanya
+        if ($user->role === 'super_admin') {
+            return $query;
+        }
+
+        // 2. Admin Biasa: Cari tahu dia anak buah SKPD mana?
+        // Alur: User -> Bidang -> SKPD
+        $skpdIdAdmin = $user->bidang->id_skpd ?? null;
+
+        if ($skpdIdAdmin) {
+            // Filter: Hanya tampilkan bidang yang skpd_id nya SAMA dengan skpd admin
+            return $query->where('id_skpd', $skpdIdAdmin);
+        }
+
+        // 3. Kalau user error/gak punya data, kosongkan hasil
+        return $query->where('id', 0);
     }
 
 }

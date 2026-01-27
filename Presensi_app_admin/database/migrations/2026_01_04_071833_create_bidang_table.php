@@ -15,6 +15,13 @@ return new class extends Migration
             $table->id('id_bidang'); // Langsung id_bidang
             $table->string('kode_bidang', 20)->unique();
             $table->string('nama_bidang', 100);
+
+            $table->foreignId('id_skpd')
+                ->nullable()
+                ->constrained('skpd')
+                ->onDelete('set null')
+                ->onUpdate('set null');
+            $table->string('nama_bidang');
         });
     }
 

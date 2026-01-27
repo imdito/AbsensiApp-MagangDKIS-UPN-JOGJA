@@ -16,11 +16,11 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->id_bidang === 1) {
+        if (Auth::check() && Auth::user()->Jabatan === "admin") {
             return $next($request);
         }
 
-        if(Auth::check() && Auth::user()->id_bidang !== 1){
+        if(Auth::check() && Auth::user()->Jabatan !== "admin"){
             return redirect('/mobile-only')->with('message', 'Anda tidak memiliki akses admin.');
         }
 

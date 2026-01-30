@@ -25,7 +25,7 @@ class LaporanController extends Controller
             'start_date' => 'nullable|date',
             'end_date'   => 'nullable|date|after_or_equal:start_date',
             'nip'        => 'nullable|string',
-            'id_bidang'  => 'nullable',
+            'id_bidang'  => 'nullable|integer',
         ]);
 
         // 2. Panggil Service untuk ambil data matang

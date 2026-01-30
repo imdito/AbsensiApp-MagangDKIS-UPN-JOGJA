@@ -10,7 +10,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final HomeController controller = Get.put(HomeController());
 
-    // Warna Tema
+    // Warna Tema Tetap Konsisten
     const Color primaryColor = Color(0xFF4F46E5); // Indigo 600
     const Color grayBg = Color(0xFFF9FAFB);
 
@@ -19,7 +19,7 @@ class HomePage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // --- HEADER SECTION ---
+            // --- HEADER SECTION (LOGO & SKPD) ---
             Container(
               padding: const EdgeInsets.fromLTRB(24, 60, 24, 40),
               decoration: const BoxDecoration(
@@ -34,31 +34,47 @@ class HomePage extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Halo, Selamat ${controller.statusHari()}',
-                            style: GoogleFonts.inter(color: Colors.white70, fontSize: 14),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            controller.user.nama,
-                            style: GoogleFonts.inter(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            controller.user.divisi,
-                            style: GoogleFonts.inter(color: Colors.indigo.shade200, fontSize: 12),
-                          )
-                        ],
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Halo, Selamat ${controller.statusHari()}',
+                              style: GoogleFonts.inter(color: Colors.white70, fontSize: 13),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              controller.user.nama,
+                              style: GoogleFonts.inter(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            // MENAMPILKAN SKPD BERDASARKAN BIDANG
+                            Text(
+                              "${controller.user.bidang} • ${controller.user.skpd}",
+                              style: GoogleFonts.inter(
+                                  color: Colors.indigo.shade100,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 0.3
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            )
+                          ],
+                        ),
                       ),
+                      const SizedBox(width: 12),
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(15),
                         ),
                         child: IconButton(
-                          icon: const Icon(Icons.logout, color: Colors.white),
+                          icon: const Icon(Icons.logout_rounded, color: Colors.white),
                           onPressed: () => controller.logout(),
                         ),
                       )
@@ -68,30 +84,33 @@ class HomePage extends StatelessWidget {
               ),
             ),
 
-            // --- STATUS CARD ---
+            // --- STATUS CARD (KHUSUS APEL PAGI) ---
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Transform.translate(
                 offset: const Offset(0, -30),
                 child: Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withOpacity(0.06),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
                     ],
                   ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildStatusItem("Jam Masuk", controller.jamMasuk.value, Icons.login, Colors.green),
-                      Container(width: 1, height: 40, color: Colors.grey.shade200),
-                      _buildStatusItem("Jam Pulang", controller.jamPulang.value, Icons.logout, Colors.orange),
+                      _buildStatusItem(
+                          "Jam Presensi Apel",
+                          controller.jamMasuk.value,
+                          Icons.alarm_on_rounded,
+                          primaryColor
+                      ),
                     ],
                   ),
                 ),
@@ -105,48 +124,43 @@ class HomePage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Daftar Menu  ",
+                    "Layanan Presensi",
                     style: GoogleFonts.inter(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF111827),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF1F2937),
+                        letterSpacing: -0.5
                     ),
                   ),
                   const SizedBox(height: 16),
 
-                  // 1. MAIN CARD
+                  // MENU UTAMA: SCAN QR
                   _buildHeroCard(
-                    title: "Scan Kehadiran",
-                    subtitle: "Tap untuk scan QR",
-                    icon: Icons.qr_code_scanner,
+                    title: "Scan QR Apel",
+                    subtitle: "Klik untuk mulai presensi",
+                    icon: Icons.qr_code_scanner_rounded,
                     color: primaryColor,
                     onTap: controller.goToPresensi,
                   ),
 
                   const SizedBox(height: 16),
 
-                  // 2. SECONDARY CARDS - Side by Side (Row)
+                  // MENU SEKUNDER
                   Row(
                     children: [
-                      // Riwayat
                       Expanded(
                         child: _buildSecondaryCard(
                           title: "Riwayat",
-                          icon: Icons.history,
+                          icon: Icons.history_rounded,
                           color: Colors.teal,
-                          onTap: () {
-                            controller.goToRiwayat();
-                          },
+                          onTap: () => controller.goToRiwayat(),
                         ),
                       ),
-
                       const SizedBox(width: 16),
-
-                      // Edit Profil
                       Expanded(
                         child: _buildSecondaryCard(
-                          title: "Edit Profil",
-                          icon: Icons.person_outline,
+                          title: "Profil",
+                          icon: Icons.person_rounded,
                           color: Colors.blueAccent,
                           onTap: controller.goToEditProfile,
                         ),
@@ -157,41 +171,50 @@ class HomePage extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 40),
+            // Tanda Air / Footer
+            Text(
+              "DKIS Kota Cirebon © 2026",
+              style: GoogleFonts.inter(fontSize: 10, color: Colors.grey.shade400, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
-  // --- WIDGET HELPER ---
+  // --- WIDGET HELPERS ---
 
-  // 1. Status Item
   Widget _buildStatusItem(String label, String time, IconData icon, Color color) {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: color.withOpacity(0.1),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: color, size: 20),
+          child: Icon(icon, color: color, size: 28),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         Text(
           time,
-          style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFF111827)),
+          style: GoogleFonts.inter(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF111827),
+              letterSpacing: -1
+          ),
         ),
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: 12, color: Colors.grey.shade500),
+          style: GoogleFonts.inter(fontSize: 13, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
         ),
       ],
     );
   }
 
-  // 2. HERO CARD
   Widget _buildHeroCard({
     required String title,
     required String subtitle,
@@ -203,23 +226,17 @@ class HomePage extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(24),
       child: Container(
-        width: double.infinity, // Full Width
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-            color: color, // Warna Primary (Indigo)
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: color.withOpacity(0.4),
-                blurRadius: 12,
-                offset: const Offset(0, 8),
-              ),
-            ],
-            image: const DecorationImage(
-              image: AssetImage('assets/pattern_bg.png'), // Opsional: jika ada pattern
-              opacity: 0.1,
-              fit: BoxFit.cover,
-            )
+          color: color,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.3),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: Row(
           children: [
@@ -227,40 +244,32 @@ class HomePage extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(18),
               ),
-              child: Icon(icon, color: Colors.white, size: 36),
+              child: Icon(icon, color: Colors.white, size: 32),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 20),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.inter(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                  style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 Text(
                   subtitle,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: Colors.white70,
-                  ),
+                  style: GoogleFonts.inter(fontSize: 12, color: Colors.white70),
                 ),
               ],
             ),
             const Spacer(),
-            const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 16)
+            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white54, size: 18)
           ],
         ),
       ),
     );
   }
 
-  // 3. SECONDARY CARD
   Widget _buildSecondaryCard({
     required String title,
     required IconData icon,
@@ -269,16 +278,16 @@ class HomePage extends StatelessWidget {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(24),
       child: Container(
-        height: 120,
+        height: 110,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(color: Colors.grey.shade100),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withOpacity(0.02),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -287,22 +296,11 @@ class HomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, size: 28, color: color),
-            ),
-            const SizedBox(height: 12),
+            Icon(icon, size: 30, color: color),
+            const SizedBox(height: 8),
             Text(
               title,
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF374151),
-              ),
+              style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold, color: const Color(0xFF374151)),
             ),
           ],
         ),

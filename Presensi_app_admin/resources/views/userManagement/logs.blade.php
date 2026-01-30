@@ -1,6 +1,6 @@
-@extends('layouts.app')
+@extends($layout)
 
-@section('title', 'Audit Log Data Pegawai')
+@section($layout=='layouts.app' ? 'title' : 'header_title', 'Data Bidang')
 
 @section('content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">

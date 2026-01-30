@@ -31,41 +31,11 @@ class Presensi extends Model
 
     protected $dates = ['deleted_at'];
 
-    protected static function booted(): void
-    {
-        static::creating(function ($model) {
-            $model->created_id = auth()->id();
-        });
-        static::updating(function ($model) {
-            $model->updated_id = auth()->id();
-        });
-        static::deleting(function ($model) {
-            $model->deleted_id = auth()->id();
-            $model->save();
-        });
-    }
 
     public function User(){
         return $this->belongsTo(User::class, 'user_id','user_id'); // menambah foreignkey pada table presensi
     }
 
-    public function creator()
-    {
-        // Relasi ke siapa yang membuat data
-        return $this->belongsTo(User::class, 'created_id')->withTrashed();
-    }
-
-    public function updater()
-    {
-        // Relasi ke siapa yang terakhir mengubah data
-        return $this->belongsTo(User::class, 'updated_id')->withTrashed();
-    }
-
-    public function destroyer()
-    {
-        // Relasi ke siapa yang menghapus data
-        return $this->belongsTo(User::class, 'deleted_id')->withTrashed();
-    }
 
     public function scopeTenanted(Builder $query)
     {

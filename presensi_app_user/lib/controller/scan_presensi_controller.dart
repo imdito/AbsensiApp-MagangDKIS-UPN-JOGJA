@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart'; // Import ini untuk handling setting
 import 'package:get/get.dart';
@@ -78,14 +80,7 @@ class ScanPresensiController extends GetxController {
       latitude.value = position.latitude;
       longitude.value = position.longitude;
 
-      // 2. Hitung Jarak
-      double jarak = _locationService.getDistanceFromOffice(latitude.value, longitude.value);
-
-      if (!_locationService.isWithinOfficeRadius(jarak)) {
-        throw "Jarak terlalu jauh: ${jarak.toStringAsFixed(2)} meter. (Maks 50m)";
-      }
-
-      // 3. Kirim API
+      // Kirim API
       final response = await _apiService.submitPresensi(
         qrCode: qrCode,
         userId: idUser.toString(),
@@ -94,20 +89,19 @@ class ScanPresensiController extends GetxController {
         context: context,
       );
 
-      // 4. Sukses
+      // Sukses
       _closeLoadingDialog(); // Tutup loading
-
+      Map<String, dynamic> data = jsonDecode(response.body);
       if (response.statusCode == 200 || response.statusCode == 201) {
         message.value = "Presensi Berhasil!";
         notifPresensi(context, message.value, true);
         Get.back();
       } else if(response.statusCode == 500){
-        print("Response Body: ${response.body}");
-        throw "Maaf, Presensi Telah Ditutup";
+        throw data['message'];
       }else {
 
         print("Response Body: ${response.body}");
-        throw "Gagal dari server: ${response.statusCode}";
+        throw "Gagal Presensi: ${data['message'] ?? 'Unknown error'}";
       }
 
     } catch (e) {
@@ -134,8 +128,6 @@ class ScanPresensiController extends GetxController {
         print("Error : $errorMsg");
         notifPresensi(context, errorMsg.replaceAll("Exception: ", ""), false);
       }
-      await Future.delayed(const Duration(seconds: 2));
-      // 3. Reset scanning agar bisa scan lagi
       isScanning.value = false;
 
     } finally {

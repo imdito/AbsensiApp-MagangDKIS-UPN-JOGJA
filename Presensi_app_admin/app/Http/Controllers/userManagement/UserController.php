@@ -12,16 +12,23 @@ class UserController extends Controller
 {
     public function index(){
         $daftar_divisi = Bidang::tenanted()->lazy();
-        return view('userManagement.tambahuser', ['daftar_divisi' => $daftar_divisi]);
+        return $this->viewWithLayout('userManagement.tambahuser', ['daftar_divisi' => $daftar_divisi]);
     }
 
     public function store(Request $request){
+        // Tentukan jabatan apa saja yang dilarang bagi user yang sedang login
+        $restrictedRoles = '';
+        if (auth()->user()->Jabatan !== 'superadmin') {
+            $restrictedRoles = '|not_in:superadmin,admin';
+        }
+
         $request->validate([
             'Nama_Pengguna' => 'required',
-            'email' => 'required',
-            'password' => 'required',
-            'NIP' => 'required',
-            'id_bidang' => 'required',
+            'email'         => 'required|email|unique:users,email',
+            'NIP'           => 'required|unique:users,NIP',
+            'id_bidang'     => 'required|integer',
+            'Jabatan'       => 'required|string' . $restrictedRoles,
+            'password'      => 'nullable|min:6',
         ]);
 
         $data = [
@@ -29,6 +36,7 @@ class UserController extends Controller
             'email' => $request->input('email'),
             'password' => bcrypt($request->input('password')),
             'NIP' => $request->input('NIP'),
+            'Jabatan' => $request->input('Jabatan'),
             'id_bidang' => $request->input('id_bidang'),
         ];
         User::create($data);
@@ -38,16 +46,23 @@ class UserController extends Controller
     public function listUsers()
     {
         $karyawan = User::with('bidang')->tenanted()->lazy();
-        return view('userManagement.indexUser', ['karyawan' => $karyawan]);
+        return $this->viewWithLayout('userManagement.indexUser', ['karyawan' => $karyawan]);
     }
 
     public function update(Request $request, $id){
+        // Tentukan jabatan apa saja yang dilarang bagi user yang sedang login
+        $restrictedRoles = '';
+        if (auth()->user()->Jabatan !== 'superadmin') {
+            $restrictedRoles = '|not_in:superadmin,admin';
+        }
+
         $request->validate([
             'Nama_Pengguna' => 'required',
-            'email' => 'required',
-            'nip' => 'required',
-            'id_bidang' => 'required',
-            'password'  => 'nullable',
+            'email'         => 'required|email|unique:users,email,' . $id . ',user_id',
+            'nip'           => 'required|unique:users,NIP,' . $id . ',user_id',
+            'id_bidang'     => 'required|integer',
+            'Jabatan'       => 'required|string' . $restrictedRoles,
+            'password'      => 'nullable|min:6',
         ]);
 
         $data = [
@@ -55,6 +70,7 @@ class UserController extends Controller
             'email' => $request->input('email'),
             'NIP' => $request->input('nip'),
             'id_bidang' => $request->input('id_bidang'),
+            'Jabatan' => $request->input('Jabatan'),
             'updated_at' => now()->toDateTimeString(),
         ];
 
@@ -76,7 +92,7 @@ class UserController extends Controller
     public function editPage($id){
         $user = User::tenanted()->findOrFail($id);
         $daftar_bidang = Bidang::tenanted()->lazy();
-        return view('userManagement.updateUser', ['user' => $user, 'daftar_divisi' => $daftar_bidang]);
+        return $this->viewWithLayout('userManagement.updateUser', ['user' => $user, 'daftar_divisi' => $daftar_bidang]);
     }
 
 }

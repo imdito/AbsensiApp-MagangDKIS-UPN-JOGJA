@@ -61,9 +61,9 @@
                            class="pl-10 block w-full rounded-lg border-gray-300 bg-gray-50 border focus:bg-white focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3 transition duration-200 ease-in-out @error('email') border-red-500 @enderror"
                            placeholder="nama@instansi.com" value="{{ old('email') }}" required autofocus>
                 </div>
-                @error('email')
-                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                @enderror
+                @if(session('message'))
+                    <p class="mt-1 text-xs text-red-500">{{ session('message') }}</p>
+                @endif
             </div>
 
             <div>

@@ -1,6 +1,6 @@
-@extends('layouts.app')
+@extends($layout)
 
-@section('title', 'Dashboard Presensi Apel ASN')
+@section($layout=='layouts.app' ? 'title' : 'header_title', 'Data Bidang')
 
 @section('content')
 
@@ -19,7 +19,7 @@
 
             {{-- Tombol Aksi --}}
             <div class="mt-4 flex flex-col md:flex-row gap-3 md:mt-0 md:ml-4">
-                <a href="{{ url('/presensi/generateQR') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                <a href="{{ route('presensi.QR')  }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
                     Lihat QR Apel Pagi
                 </a>
                 <a href="{{ route('presensi') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">

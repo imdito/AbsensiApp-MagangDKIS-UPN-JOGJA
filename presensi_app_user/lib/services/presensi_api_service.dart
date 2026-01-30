@@ -39,17 +39,14 @@ class PresensiApiService {
   }
 
   Future<List<PresensiModel>> fetchRiwayatPresensi({
-    required int userId, // Sebaiknya berikan tipe data (int/String)
+    required int userId,
   }) async {
-    // 1. PERBAIKAN URL QUERY PARAMETER
-    // Menggunakan key 'user_id' agar dikenali di Laravel ($request->user_id)
     final url = Uri.parse('$baseUrl/api/presensi/riwayat/$userId');
 
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       final String? token = prefs.getString('auth_token');
 
-      // Debugging: Cek URL dan Token di console
       print("Fetching data from: $url");
 
       final response = await http.get(

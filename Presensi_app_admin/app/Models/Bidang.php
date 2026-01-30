@@ -26,23 +26,9 @@ class Bidang extends Model
 
     protected $dates = ['deleted_at'];
 
-    protected static function booted(): void
-    {
-        static::creating(function ($model) {
-            $model->created_id = auth()->id();
-        });
-        static::updating(function ($model) {
-            $model->updated_id = auth()->id();
-        });
-        static::deleting(function ($model) {
-            $model->deleted_id = auth()->id();
-            $model->save();
-        });
-    }
-
     public function skpd(): BelongsTo
     {
-        return $this->belongsTo(Skpd::class, 'skpd_id');
+        return $this->belongsTo(Skpd::class, 'id_skpd');
     }
 
     // Relasi ke User (Satu bidang punya banyak user)
@@ -51,31 +37,13 @@ class Bidang extends Model
         return $this->hasMany(User::class, 'id_bidang', 'id_bidang');
     }
 
-    public function creator()
-    {
-        // Relasi ke siapa yang membuat data
-        return $this->belongsTo(User::class, 'created_id')->withTrashed();
-    }
-
-    public function updater()
-    {
-        // Relasi ke siapa yang terakhir mengubah data
-        return $this->belongsTo(User::class, 'updated_id')->withTrashed();
-    }
-
-    public function destroyer()
-    {
-        // Relasi ke siapa yang menghapus data
-        return $this->belongsTo(User::class, 'deleted_id')->withTrashed();
-    }
-
 
     public function scopeTenanted($query)
     {
         $user = auth()->user();
 
         // 1. Super Admin melihat semuanya
-        if ($user->role === 'super_admin') {
+        if ($user->Jabatan === 'superadmin') {
             return $query;
         }
 

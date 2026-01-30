@@ -22,7 +22,7 @@ class LoginController extends controller{
             $request->session()->regenerate();
             return redirect()->intended('/');
         }
-        return back()->with('message', 'Login failed!');
+        return back()->with('message', 'Email atau Password Salah!');
     }
 
     public function logout(Request $request){
@@ -33,14 +33,23 @@ class LoginController extends controller{
     }
 
     public function loginAPI(Request $request){
-       $credentials  = $request->validate([
-            'email' => 'required|string',
-            'password' => 'required|string'
-
+        $request->validate([
+            'login'    => 'required|string', // Ini bisa berisi email atau NIP
+            'password' => 'required|string',
         ]);
+
+        // Tentukan apakah input adalah email atau nip
+        $loginType = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'NIP';
+
+        $credentials = [
+            $loginType => $request->login,
+            'password' => $request->password,
+        ];
 
         if(Auth::attempt($credentials)){
             $user = Auth::user();
+
+            $user->load('bidang.skpd');
             $token = $user->createToken('auth_token')->plainTextToken;
 
             return response()->json([
@@ -48,11 +57,11 @@ class LoginController extends controller{
                 'token_type' => 'Bearer',
                 'user' => [
                     'user_id' => $user->user_id,
-                    'nama' => $user->Nama_Pengguna,
-                    'email' => $user->email,
-                    'divisi' => $user->bidang->nama_bidang,
-                    'NIP' => $user->NIP,
-
+                    'nama'    => $user->Nama_Pengguna,
+                    'email'   => $user->email,
+                    'NIP'     => $user->NIP,
+                    'bidang'  => $user->bidang->nama_bidang ?? 'Tanpa Bidang',
+                    'skpd'    => $user->bidang->skpd->nama ?? 'Tanpa SKPD',
                 ]
             ]);
         }

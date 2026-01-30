@@ -1,6 +1,6 @@
-@extends('layouts.app')
+@extends($layout)
 
-@section('title', 'Update Data Karyawan')
+@section($layout=='layouts.app' ? 'title' : 'header_title', 'Data Bidang')
 
 @section('content')
 
@@ -49,7 +49,7 @@
                     <label for="nama" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
                     <div class="mt-1">
                         <input type="text" name="Nama_Pengguna" id="nama"
-                               value="{{ old('nama', $user->Nama_Pengguna) }}" required
+                               value="{{ old('Nama_Pengguna', $user->Nama_Pengguna) }}" required
                                class="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-200">
                     </div>
                 </div>
@@ -85,6 +85,15 @@
                     </div>
                 </div>
 
+                <div>
+                    <label for="Jabatan" class="block text-sm font-medium text-gray-700">Jabatan</label>
+                    <div class="mt-1">
+                        <input type="text" name="Jabatan" id="Jabatan"
+                               value="{{ old('Jabatan', $user->Jabatan) }}" required
+                               placeholder="Contoh: Staff Administrasi"
+                               class="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-200">
+                    </div>
+                </div>
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700">Alamat Email</label>
                     <div class="mt-1">

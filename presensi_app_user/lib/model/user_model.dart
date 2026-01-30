@@ -3,15 +3,17 @@
 class UserModel {
   int id;
   String nama;
-  String divisi;
+  String bidang;
   String email;
+  String skpd;
   String nip;
 
   UserModel({
     required this.id,
     required this.nama,
-    required this.divisi,
+    required this.bidang,
     required this.email,
+    required this.skpd,
     required this.nip,
   });
 
@@ -21,7 +23,8 @@ class UserModel {
       id: json['user_id'],
       nama: json['nama'],
       email: json['email'],
-      divisi: json['divisi'],
+      bidang: json['bidang'],
+      skpd: json['skpd'],
       nip: json['NIP'],
     );
   }
@@ -32,7 +35,7 @@ class UserModel {
       'user_id': id,
       'nama': nama,
       'email': email,
-      'divisi': divisi,
+      'bidang': bidang,
       'nip' : nip,
     };
   }

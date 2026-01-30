@@ -1,12 +1,12 @@
-@extends('layouts.app')
+@extends($layout)
 
-@section('title', 'Tambah Karyawan Baru')
+@section($layout=='layouts.app' ? 'title' : 'header_title', 'Data Bidang')
 
 @section('content')
 
     <div class="max-w-2xl w-full space-y-8 mx-auto">
 
-    <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between">
             <div>
                 <h2 class="text-2xl font-bold text-gray-900">Registrasi Karyawan</h2>
                 <p class="mt-1 text-sm text-gray-500">Buat akun baru untuk akses sistem presensi.</p>
@@ -51,11 +51,10 @@
                 </div>
 
                 <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-
                     <div>
                         <label for="NIP" class="block text-sm font-medium text-gray-700">NIP (Nomor Induk)</label>
                         <div class="mt-1">
-                            <input type="number" name="NIP" id="NIP" value="{{ old('nip') }}" required placeholder="12345678"
+                            <input type="number" name="NIP" id="NIP" value="{{ old('NIP') }}" required placeholder="12345678"
                                    class="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                         </div>
                     </div>
@@ -64,20 +63,23 @@
                         <label for="id_bidang" class="block text-sm font-medium text-gray-700">Bidang</label>
                         <select name="id_bidang" id="id_bidang" required
                                 class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white">
-
                             <option value="" disabled>-- Pilih Bidang --</option>
-
                             @foreach($daftar_divisi as $item)
                                 <option value="{{ $item->id_bidang }}">
-
                                     {{ $item->nama_bidang }}
                                 </option>
                             @endforeach
-
                         </select>
                     </div>
                 </div>
 
+                <div>
+                    <label for="Jabatan" class="block text-sm font-medium text-gray-700">Jabatan</label>
+                    <div class="mt-1">
+                        <input type="text" name="Jabatan" id="Jabatan" value="{{ old('Jabatan') }}" required placeholder="Contoh: Staff Administrasi"
+                               class="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                </div>
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700">Alamat Email</label>
                     <div class="mt-1">
@@ -99,11 +101,9 @@
 
                 <div class="border-t border-gray-100 pt-6">
                     <div class="flex items-center justify-end gap-3">
-
                         <a href="{{ url('/') }}" class="bg-white py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
                             Batal
                         </a>
-
                         <button type="submit" class="inline-flex justify-center py-2.5 px-4 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all transform hover:-translate-y-0.5">
                             <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />

@@ -1,6 +1,6 @@
-@extends('layouts.app')
+@extends($layout)
 
-@section('title', 'Audit Log Data Bidang')
+@section($layout=='layouts.app' ? 'title' : 'header_title', 'Audit Log Bidang')
 
 @section('content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -12,7 +12,7 @@
                     Audit Data Bidang
                 </h2>
                 <p class="mt-1 text-sm text-gray-500">
-                    Rekaman jejak digital seluruh aktivitas manajemen data master bidang/divisi.
+                    Rekaman jejak digital seluruh aktivitas manajemen data master bidang.
                 </p>
             </div>
             <div class="mt-4 flex md:mt-0 md:ml-4">
@@ -40,16 +40,46 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($logs as $log)
+                        @php
+                            // Tentukan waktu utama yang akan ditampilkan (Pilih yang tidak null)
+                            $waktuUtama = $log->updated_at ?? $log->created_at;
+
+                            // Tentukan Aksi & Admin
+                            if ($log->trashed()) {
+                                $statusLabel = 'Dihapus';
+                                $statusColor = 'red';
+                                $iconPath    = 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16';
+                                $admin       = $log->destroyer;
+                                $adminID     = $log->deleted_id;
+                            } elseif ($log->updated_at && $log->created_at && $log->updated_at->gt($log->created_at)) {
+                                $statusLabel = 'Diperbarui';
+                                $statusColor = 'yellow';
+                                $iconPath    = 'M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z';
+                                $admin       = $log->updater;
+                                $adminID     = $log->updated_id;
+                            } else {
+                                $statusLabel = 'Input Baru';
+                                $statusColor = 'green';
+                                $iconPath    = 'M12 6v6m0 0v6m0-6h6m-6 0H6';
+                                $admin       = $log->creator;
+                                $adminID     = $log->created_id;
+                            }
+                        @endphp
                         <tr class="hover:bg-gray-50 transition-colors">
 
-                            {{-- 1. Waktu Kejadian --}}
+                            {{-- 1. Waktu Kejadian (Safe from Null) --}}
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-bold text-gray-900">{{ $log->updated_at->format('d M Y') }}</div>
-                                <div class="text-xs text-gray-500 font-mono mt-0.5">{{ $log->updated_at->format('H:i:s') }} WIB</div>
+                                @if($waktuUtama)
+                                    <div class="text-sm font-bold text-gray-900">{{ $waktuUtama->format('d M Y') }}</div>
+                                    <div class="text-xs text-gray-500 font-mono mt-0.5">{{ $waktuUtama->format('H:i:s') }} WIB</div>
+                                @else
+                                    <div class="text-xs text-gray-400 italic">Waktu tidak tercatat</div>
+                                @endif
 
-                                @if($log->updated_at != $log->created_at)
-                                    <div class="mt-2 pt-2 border-t border-gray-100 group">
-                                        <span class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Dibuat:</span>
+                                {{-- Jika ini adalah update, tampilkan waktu created sebagai info tambahan --}}
+                                @if($log->updated_at && $log->created_at && $log->updated_at->gt($log->created_at))
+                                    <div class="mt-2 pt-2 border-t border-gray-100">
+                                        <span class="text-[10px] text-gray-400 uppercase font-semibold">Dibuat:</span>
                                         <div class="text-xs text-gray-500">
                                             {{ $log->created_at->format('d M Y H:i') }}
                                         </div>
@@ -57,108 +87,60 @@
                                 @endif
                             </td>
 
-                            {{-- 2. Nama Bidang (Disesuaikan dari Pegawai) --}}
+                            {{-- 2. Nama Bidang --}}
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    {{-- Ikon Gedung / Kantor --}}
                                     <div class="h-8 w-8 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 mr-3">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m3 4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                         </svg>
                                     </div>
                                     <div>
-                                        <div class="text-sm font-bold text-gray-900">
-                                            {{-- Ganti 'Nama_Bidang' sesuai kolom di database Anda --}}
-                                            {{ $log->nama_bidang ?? 'Nama Tidak Tersedia' }}
-                                        </div>
-                                        <div class="text-xs text-gray-500">ID Bidang: {{ $log->id_bidang }}</div>
+                                        <div class="text-sm font-bold text-gray-900">{{ $log->nama_bidang ?? 'N/A' }}</div>
+                                        <div class="text-xs text-gray-500 font-mono tracking-tighter">ID: {{ $log->id_bidang }}</div>
                                     </div>
                                 </div>
                             </td>
 
                             {{-- 3. Jenis Aktivitas --}}
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @if($log->trashed())
-                                    <div class="flex items-center text-red-600 bg-red-50 px-3 py-1 rounded-full w-max border border-red-100">
-                                        <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                        <span class="text-xs font-semibold">Dihapus</span>
-                                    </div>
-                                @elseif($log->updated_at != $log->created_at)
-                                    <div class="flex items-center text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full w-max border border-yellow-100">
-                                        <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                        <span class="text-xs font-semibold">Diperbarui</span>
-                                    </div>
-                                @else
-                                    <div class="flex items-center text-green-600 bg-green-50 px-3 py-1 rounded-full w-max border border-green-100">
-                                        <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                                        <span class="text-xs font-semibold">Input Baru</span>
-                                    </div>
-                                @endif
+                                <div class="flex items-center text-{{ $statusColor }}-600 bg-{{ $statusColor }}-50 px-3 py-1 rounded-full w-max border border-{{ $statusColor }}-100">
+                                    <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $iconPath }}"></path>
+                                    </svg>
+                                    <span class="text-xs font-semibold">{{ $statusLabel }}</span>
+                                </div>
                             </td>
 
                             {{-- 4. Oleh (Admin) --}}
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @php
-                                    $adminName = 'System';
-                                    $adminID   = '-';
-
-                                    if ($log->trashed()) {
-                                        $adminName = $log->destroyer->Nama_Pengguna ?? 'System';
-                                        $adminID   = $log->deleted_id;
-                                    } elseif ($log->updated_at != $log->created_at) {
-                                        $adminName = $log->updater->Nama_Pengguna ?? 'System';
-                                        $adminID   = $log->updated_id;
-                                    } else {
-                                        $adminName = $log->creator->Nama_Pengguna ?? 'System';
-                                        $adminID   = $log->created_id;
-                                    }
-                                @endphp
-
                                 <div class="flex items-center">
                                     <svg class="h-4 w-4 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                     </svg>
                                     <div>
-                                        <div class="text-sm font-medium text-gray-900">
-                                            {{ $adminName }}
-                                        </div>
-                                        <div class="text-xs text-gray-500">
-                                            ID: {{ $adminID ?? '-' }}
-                                        </div>
+                                        <div class="text-sm font-medium text-gray-900">{{ $admin->Nama_Pengguna ?? 'System' }}</div>
+                                        <div class="text-xs text-gray-500">ID: {{ $adminID ?? '-' }}</div>
                                     </div>
                                 </div>
                             </td>
 
                             {{-- 5. Status Data --}}
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @if($log->trashed())
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
-                                        Soft Deleted
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
-                                        Active
-                                    </span>
-                                @endif
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $log->trashed() ? 'bg-gray-100 text-gray-800' : 'bg-blue-100 text-blue-800' }}">
+                                    {{ $log->trashed() ? 'Soft Deleted' : 'Active' }}
+                                </span>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-10 text-center text-gray-500">
-                                <div class="flex flex-col items-center justify-center">
-                                    <svg class="h-10 w-10 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m3 4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                    </svg>
-                                    <span class="font-medium">Belum ada log aktivitas bidang yang tercatat.</span>
-                                </div>
-                            </td>
+                            <td colspan="5" class="px-6 py-10 text-center text-gray-500 italic">Belum ada jejak aktivitas.</td>
                         </tr>
                     @endforelse
                     </tbody>
                 </table>
             </div>
 
-            {{-- Pagination: Bagian ini akan muncul jika Controller mengirim data via paginate() --}}
             @if(method_exists($logs, 'links') && $logs->hasPages())
                 <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
                     {{ $logs->links() }}

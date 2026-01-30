@@ -1,7 +1,7 @@
 @php use Carbon\Carbon; @endphp
-@extends('layouts.app')
+@extends($layout)
 
-@section('title', 'Edit Data Presensi')
+@section($layout=='layouts.app' ? 'title' : 'header_title', 'Edit Presensi')
 
 @section('content')
 

@@ -2,6 +2,14 @@
 
 @section('header_title', 'Tambah SKPD Baru')
 
+{{-- Tambahkan CSS Leaflet di head --}}
+@push('styles')
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map { height: 350px; border-radius: 0.75rem; border: 2px solid #e5e7eb; }
+    </style>
+@endpush
+
 @section('content')
     <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-sm border border-gray-100 p-8">
 
@@ -13,17 +21,33 @@
                 <input type="text" name="nama_skpd" value="{{ old('nama_skpd') }}"
                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none @error('nama_skpd') border-red-500 @else border-gray-300 @enderror"
                        placeholder="Contoh: Dinas Komunikasi dan Informatika">
-
                 @error('nama_skpd')
                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
             <div class="mb-5">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Alamat Kantor</label>
-                <textarea name="alamat" rows="3"
+                <label class="block text-sm font-medium text-gray-700 mb-2">Alamat Kantor <span class="text-red-500">*</span></label>
+                <textarea name="alamat" rows="2" required
                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                           placeholder="Jalan Raya No. 123...">{{ old('alamat') }}</textarea>
+            </div>
+
+            <div class="mb-5">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Lokasi Koordinat (Klik pada peta)</label>
+                <div id="map" class="mb-3"></div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <input type="text" name="latitude" id="latitude" readonly value="{{ old('latitude') }}"
+                               class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-xs" placeholder="Latitude">
+                    </div>
+                    <div>
+                        <input type="text" name="longitude" id="longitude" readonly value="{{ old('longitude') }}"
+                               class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-xs" placeholder="Longitude">
+                    </div>
+                </div>
+                @error('latitude') <p class="text-red-500 text-xs mt-1">Koordinat wajib dipilih pada peta.</p> @enderror
             </div>
 
             <div class="mb-6">
@@ -33,12 +57,50 @@
                        placeholder="021-xxxxxx">
             </div>
 
-            <div class="flex justify-end space-x-3">
-                <a href="{{ route('skpd.index') }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium">Batal</a>
-                <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium shadow-md transition-transform transform active:scale-95">
-                    Simpan Data
+            <div class="flex justify-end space-x-3 pt-4 border-t">
+                <a href="{{ route('skpd.index') }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium transition-colors">Batal</a>
+                <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium shadow-md transition-all active:scale-95">
+                    Simpan SKPD
                 </button>
             </div>
         </form>
     </div>
 @endsection
+
+{{-- Script Leaflet --}}
+@push('scripts')
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Inisialisasi Peta (Default Cirebon)
+        var map = L.map('map').setView([-6.7219, 108.5561], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        var marker;
+
+        // Jika ada koordinat 'old' dari validasi gagal, tampilkan kembali
+        @if(old('latitude') && old('longitude'))
+        var oldLat = {{ old('latitude') }};
+        var oldLng = {{ old('longitude') }};
+        marker = L.marker([oldLat, oldLng]).addTo(map);
+        map.setView([oldLat, oldLng], 15);
+        @endif
+
+        // Fungsi klik pada peta
+        map.on('click', function(e) {
+            var lat = e.latlng.lat.toFixed(8);
+            var lng = e.latlng.lng.toFixed(8);
+
+            if (marker) {
+                marker.setLatLng(e.latlng);
+            } else {
+                marker = L.marker(e.latlng).addTo(map);
+            }
+
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+        });
+    </script>
+@endpush

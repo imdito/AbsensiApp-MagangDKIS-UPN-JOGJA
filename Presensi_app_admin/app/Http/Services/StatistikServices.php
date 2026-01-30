@@ -98,9 +98,15 @@ class StatistikServices{
             $p = $k->presensi->first();
 
             if($p) {
-                if($p->status->value == 'Hadir') $stats['hadir']++;
-                elseif($p->status->value == 'Telat') $stats['telat']++;
-                elseif($p->status->value == 'Izin' || $p->status->value == 'Sakit') $stats['izin']++;
+                if($p->status->value == 'Hadir') {
+                    $stats['hadir']++;
+                }
+                elseif($p->status->value == 'Telat') {
+                    $stats['telat']++;
+                }
+                elseif($p->status->value == 'Izin' || $p->status->value == 'Sakit') {
+                    $stats['izin']++;
+                }
             }
         }
 

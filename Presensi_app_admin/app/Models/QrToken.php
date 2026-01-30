@@ -21,20 +21,7 @@ class QrToken extends Model
     ];
 
     protected $dates = ['deleted_at'];
-
-    protected static function booted(): void
-    {
-        static::creating(function ($model) {
-            $model->created_id = auth()->id();
-        });
-        static::updating(function ($model) {
-            $model->updated_id = auth()->id();
-        });
-        static::deleting(function ($model) {
-            $model->deleted_id = auth()->id();
-            $model->save();
-        });
-    }
+    
 
     protected $fillable = [
         'token',

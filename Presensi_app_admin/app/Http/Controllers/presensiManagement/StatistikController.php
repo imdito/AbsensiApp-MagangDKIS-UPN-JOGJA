@@ -15,6 +15,18 @@ class StatistikController extends Controller
 {
     public function index()
     {
+        if(auth()->user()->Jabatan == 'superadmin'){
+            return redirect()->route('dashboard.super_admin');
+        }
+
+        if(auth()->user()->Jabatan == 'Frontliner'){
+            return redirect()->route('frontliner.index');
+        }
+
+        if(auth()->user()->Jabatan !== 'admin'){
+            return redirect('/mobile-only');
+        }
+
         $daftar_presensi = Presensi::tenanted()->with(['user.bidang'])->orderBy('tanggal', 'desc')->get();
 
         $rekap_divisi = Bidang::tenanted()->withCount([
@@ -26,7 +38,7 @@ class StatistikController extends Controller
                 });
             }
         ])->get();
-        return view('app.index', compact('daftar_presensi', 'rekap_divisi'));
+        return $this->viewWithLayout('app.index', compact('daftar_presensi', 'rekap_divisi'));
     }
 
     public function superAdmin()
@@ -43,7 +55,7 @@ class StatistikController extends Controller
                                     ->with('skpd')
                                     ->get(),
 
-            'recent_skpds'  => Skpd::latest()->take(5)->get(),
+            'recent_skpds'  => Skpd::latest()->take(5)->withCount('bidang')->get(),
         ];
 
         return view('superAdmin.index', $data);

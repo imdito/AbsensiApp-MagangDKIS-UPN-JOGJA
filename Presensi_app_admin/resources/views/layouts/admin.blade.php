@@ -6,10 +6,10 @@
     <title>@yield('title', 'Admin Dashboard')</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    @stack('styles')
 
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -25,29 +25,49 @@
             <span class="text-lg font-bold tracking-tight text-gray-900">E-Presensi</span>
         </div>
 
+        @php
+            $activeClass = 'flex items-center px-4 py-3 text-indigo-600 bg-indigo-50 rounded-lg transition-colors border-l-4 border-indigo-600';
+            $defaultClass = 'flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-indigo-600 rounded-lg transition-colors';
+        @endphp
+
         <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Main Menu</p>
+            <p class="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Overview</p>
 
-            <a href="#" class="flex items-center px-4 py-3 Ftext-indigo-600 bg-indigo-50 rounded-lg transition-colors">
-                <i class="fa-solid fa-gauge w-6"></i>
-                <span class="font-medium">Dashboard</span>
+            <a href="{{ url('/Super-Admin') }}"
+               class="{{ request()->is('Super-Admin*') ? $activeClass : $defaultClass }}">
+                <i class="fa-solid fa-server w-6 text-lg"></i>
+                <span class="font-medium ml-1">Sistem</span>
+            </a>
+            <a href="{{ url('/') }}"
+               class="{{ request()->is('/') ? $activeClass : $defaultClass }}">
+                <i class="fa-solid fa-house-chimney w-6 text-lg"></i>
+                <span class="font-medium ml-1">Dashboard Utama</span>
             </a>
 
-            <a href="{{Route('skpd.index')}}" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-indigo-600 rounded-lg transition-colors">
+            <div class="my-4 border-t border-gray-100 mx-4"></div>
+
+            <p class="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Main Menu</p>
+
+            <a href="{{ route('skpd.index') }}"
+               class="{{ request()->routeIs('skpd.*') ? $activeClass : $defaultClass }}">
                 <i class="fa-solid fa-building w-6"></i>
-                <span class="font-medium">Data SKPD</span>
+                <span class="font-medium ml-1">Data SKPD</span>
             </a>
 
-            <a href="/" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-indigo-600 rounded-lg transition-colors">
+            <a href="{{ route('bidang.index') }}"
+               class="{{ request()->routeIs('bidang.*') ? $activeClass : $defaultClass }}">
                 <i class="fa-solid fa-sitemap w-6"></i>
-                <span class="font-medium">Data Bidang</span>
+                <span class="font-medium ml-1">Data Bidang</span>
             </a>
 
-            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mt-6 mb-2">Users</p>
+            <div class="my-4 border-t border-gray-100 mx-4"></div>
 
-            <a href="/" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-indigo-600 rounded-lg transition-colors">
+            <p class="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Users</p>
+
+            <a href="{{ url('/karyawan') }}"
+               class="{{ request()->is('karyawan*') ? $activeClass : $defaultClass }}">
                 <i class="fa-solid fa-users w-6"></i>
-                <span class="font-medium">Manajemen User</span>
+                <span class="font-medium ml-1">Manajemen User</span>
             </a>
         </nav>
 
@@ -82,6 +102,6 @@
         </main>
     </div>
 </div>
-
+@stack('scripts')
 </body>
 </html>

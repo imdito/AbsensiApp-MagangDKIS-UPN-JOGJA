@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Http\Services\LocationService;
 use App\Models\Presensi;
 use App\Models\QrToken;
 use App\Models\User;
@@ -13,15 +14,16 @@ class PresensiController extends Controller{
     public function create(){
         $users = User::lazy();
         $daftar_qr = QrToken::orderBy('Created_at', 'desc')->lazy();
-        return view('app.create', compact('users', 'daftar_qr'));
+        return $this->viewWithLayout('app.create', compact('users', 'daftar_qr'));
     }
 
     public function store(Request $request){
         $request->validate([
+            'user_id' => 'required',
             'tanggal' => 'required|date',
             'status' => 'required|in:Hadir,Izin,Tidak Hadir',
             'jam_masuk' => 'required',
-
+            'Id_QR' => 'required',
         ]);
 
         $data = [
@@ -42,15 +44,17 @@ class PresensiController extends Controller{
         $presensi = Presensi::tenanted()->find($id);
         $users = User::tenanted()->lazy();
         $daftar_qr = QrToken::orderBy('Created_at', 'desc')->lazy();
-        return view('app.edit', compact('presensi', 'users', 'daftar_qr'));
+        return $this->viewWithLayout('app.edit', compact('presensi', 'users', 'daftar_qr'));
 
     }
 
     public function update( Request $request, $id){
         $request->validate([
+            'user_id' => 'required',
             'tanggal' => 'required|date',
             'status' => 'required|string',
             'jam_masuk' => 'required',
+            'Id_QR' => 'required',
         ]);
 
         $data = [
@@ -69,7 +73,7 @@ class PresensiController extends Controller{
         return redirect('/');
     }
 
-    public function storeViaQR(Request $request){
+    public function storeViaQR(Request $request, LocationService $locationService){
         $request ->validate([
             'qr_token' => 'required',
             'user_id' => 'required',
@@ -102,16 +106,34 @@ class PresensiController extends Controller{
             ],500);
         }
 
+        $isDuplicate = Presensi::where('user_id', $request->user_id)
+            ->where('Id_QR', $validasiToken->Id_QR)
+            ->exists();
+
+        if ($isDuplicate) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Anda sudah melakukan presensi untuk sesi ini!',
+            ], 422);
+        }
+
         try {
-            Presensi::create([
-                'Id_QR' => $validasiToken->Id_QR,
-                'user_id' => $request->user_id,
-                'tanggal' => Carbon::now()->toDateString(),
-                'status' => $status,
-                'jam_masuk' => Carbon::now()->toDateTimeString(),
-                'Longitude' => $request->Longitude,
-                'Latitude' => $request->Latitude,
-            ]);
+            if($locationService->isWithinRadius($request->Latitude, $request->Longitude, $request->user_id )){
+                Presensi::create([
+                    'Id_QR' => $validasiToken->Id_QR,
+                    'user_id' => $request->user_id,
+                    'tanggal' => Carbon::now()->toDateString(),
+                    'status' => $status,
+                    'jam_masuk' => Carbon::now()->toDateTimeString(),
+                    'Longitude' => $request->Longitude,
+                    'Latitude' => $request->Latitude,
+                ]);
+            }else{
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Lokasi Anda berada di luar area yang diizinkan untuk presensi. Silakan coba lagi dari lokasi yang sesuai.'
+                ],500);
+            }
         }catch (Exception $e){
 
             return response()->json([

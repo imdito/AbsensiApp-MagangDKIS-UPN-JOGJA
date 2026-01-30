@@ -16,7 +16,7 @@ class LogsController extends Controller
             ->latest()
             ->paginate(8);
 
-        return view('app.logs', compact('logs'));
+        return $this->viewWithLayout('app.logs', compact('logs'));
     }
 
     public function pegawai()
@@ -26,17 +26,18 @@ class LogsController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('userManagement.logs', compact('logs'));
+        return $this->viewWithLayout('userManagement.logs', compact('logs'));
     }
 
     public function bidang()
     {
-        $logs = Bidang::tenanted()->withTrashed()
+        $logs = Bidang::tenanted()
+            ->withTrashed()
             ->with(['creator', 'updater', 'destroyer'])
-            ->latest()
+            ->orderByRaw('COALESCE(updated_at, created_at) DESC')
             ->paginate(4);
 
-        return view('manajemenBidang.logs', compact('logs'));
+        return $this->viewWithLayout('manajemenBidang.logs', compact('logs'));
     }
 
     public function QrToken()

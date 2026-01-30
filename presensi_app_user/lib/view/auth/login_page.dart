@@ -61,7 +61,7 @@ class LoginPage extends StatelessWidget {
 
                 // --- EMAIL INPUT ---
                 Text(
-                  'Alamat Email',
+                  'Alamat Email atau NIP',
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,

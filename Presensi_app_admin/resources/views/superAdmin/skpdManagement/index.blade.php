@@ -25,7 +25,6 @@
                     <th class="px-6 py-3">No</th>
                     <th class="px-6 py-3">Nama SKPD</th>
                     <th class="px-6 py-3">Alamat</th>
-                    <th class="px-6 py-3">Telepon</th>
                     <th class="px-6 py-3 text-center">Aksi</th>
                 </tr>
                 </thead>
@@ -34,8 +33,7 @@
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 text-gray-500">{{ $skpds->firstItem() + $index }}</td>
                         <td class="px-6 py-4 font-medium text-gray-900">{{ $item->nama }}</td>
-                        <td class="px-6 py-4 text-gray-500">{{ $item->alamat ?? '-' }}</td>
-                        <td class="px-6 py-4 text-gray-500">{{ $item->telepon ?? '-' }}</td>
+                        <td class="px-6 py-4 text-gray-500">{{ $item->Alamat ?? '-' }}</td>
                         <td class="px-6 py-4 text-center">
                             <div class="flex justify-center space-x-2">
                                 <a href="{{ route('skpd.edit', $item->id) }}" class="text-yellow-500 hover:text-yellow-600 border border-yellow-200 bg-yellow-50 px-3 py-1 rounded-md transition-colors">

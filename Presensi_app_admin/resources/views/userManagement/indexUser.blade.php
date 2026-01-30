@@ -1,6 +1,6 @@
-@extends('layouts.app')
+@extends($layout)
 
-@section('title', 'Manajemen Karyawan')
+@section($layout=='layouts.app' ? 'title' : 'header_title', 'Data Karyawan')
 
 @section('content')
 
@@ -68,7 +68,12 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">
-                                    {{ $user->bidang->nama_bidang ?? 'Staff' }}
+                                    {{ $user->bidang->nama_bidang ?? '--:--' }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">
+                                    {{ $user->Jabatan ?? 'Staff' }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

@@ -34,7 +34,7 @@ class LoginController extends GetxController {
         Uri.parse('$baseUrl/api/login'),
         headers: {'Accept': 'application/json'},
         body: {
-          'email': email,
+          'login': email,
           'password': password
         },
       );
@@ -53,15 +53,16 @@ class LoginController extends GetxController {
         await prefs.setString('user_data', jsonEncode(userjson));
         // Update state token
         token.value = newToken;
-
+        FocusManager.instance.primaryFocus?.unfocus();
         Get.snackbar("Sukses", "Login Berhasil",
             snackPosition: SnackPosition.BOTTOM, backgroundColor: Get.theme.primaryColorLight);
-        dispose();
-        Get.to(const HomePage(), arguments: {
+        Get.offAll(const HomePage(), arguments: {
           'user': user,
           'token': newToken,
         }); // Pindah ke Home & Hapus riwayat Login
       } else {
+        print("Login failed with status: ${response.statusCode}");
+        print("Response body: ${response.body}");
         Get.snackbar("Error", "Login Gagal. Cek email/password.",
             snackPosition: SnackPosition.BOTTOM, backgroundColor: Get.theme.colorScheme.error);
       }

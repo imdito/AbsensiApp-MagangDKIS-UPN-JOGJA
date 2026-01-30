@@ -1,6 +1,6 @@
-@extends('layouts.app')
+@extends($layout)
 
-@section('title', 'Data Bidang')
+@section($layout=='layouts.app' ? 'title' : 'header_title', 'Data Bidang')
 
 @section('content')
 

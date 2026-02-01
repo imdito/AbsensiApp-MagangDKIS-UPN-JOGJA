@@ -7,6 +7,7 @@ use App\Models\QrToken;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use mysql_xdevapi\Exception;
 
 class PresensiController extends Controller{
@@ -43,7 +44,7 @@ class PresensiController extends Controller{
     public function edit($id){
         $presensi = Presensi::tenanted()->find($id);
         $users = User::tenanted()->lazy();
-        $daftar_qr = QrToken::orderBy('Created_at', 'desc')->lazy();
+        $daftar_qr = QrToken::tenanted()->orderBy('Created_at', 'desc')->lazy();
         return $this->viewWithLayout('app.edit', compact('presensi', 'users', 'daftar_qr'));
 
     }
@@ -80,34 +81,15 @@ class PresensiController extends Controller{
             'Latitude' => 'required',
             'Longitude' => 'required',
         ]);
-
-        $jam_absen = now()->toTimeString();
-        $tepat_waktu = '14:30:00';
-        $batas_absen = '16:00:00';
-
-        $status = 'Hadir';
-        if($jam_absen > $tepat_waktu && $jam_absen <= $batas_absen){
-            $status = 'Izin';
-        }elseif($jam_absen > $batas_absen){
-            $status = 'Tidak Hadir';
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Anda terlambat melebihi batas absen. Silakan hubungi admin.'
-            ], 500);
-        }
-
-        $validasiToken =QrToken::where('token', $request->qr_token)
-            ->where('Expired_at', '>=', Carbon::now()->toDateTimeString() )->first();
-
+        $validasiToken = Cache::get("active_qr:{$request->qr_token}_with_skpd:{$request->user()->bidang->id_skpd}");
         if(!$validasiToken){
             return response()->json([
                 'status' => 'error',
                 'message' => 'QR Code sudah kadaluwarsa atau tidak valid. Silakan scan ulang QR terbaru.'
-            ],500);
+            ],410);
         }
-
         $isDuplicate = Presensi::where('user_id', $request->user_id)
-            ->where('Id_QR', $validasiToken->Id_QR)
+            ->where('Id_QR', $validasiToken['Id_QR'])
             ->exists();
 
         if ($isDuplicate) {
@@ -118,9 +100,27 @@ class PresensiController extends Controller{
         }
 
         try {
+
+            $jam_absen = now();
+            $expired_at = Carbon::parse($validasiToken['Expired_at']);
+
+            $batas_izin = $expired_at->copy()->subMinutes(30);
+
+            $status = 'Hadir';
+
+            if ($jam_absen->gt($batas_izin) && $jam_absen->lte($expired_at)) {
+                $status = 'Izin';
+            } elseif ($jam_absen->gt($expired_at)) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Anda terlambat melebihi batas absen.'
+                ], 403); // Anda bisa gunakan 403 (Forbidden) atau 422 (Unprocessable)
+            }
+
+
             if($locationService->isWithinRadius($request->Latitude, $request->Longitude, $request->user_id )){
                 Presensi::create([
-                    'Id_QR' => $validasiToken->Id_QR,
+                    'Id_QR' => $validasiToken['Id_QR'],
                     'user_id' => $request->user_id,
                     'tanggal' => Carbon::now()->toDateString(),
                     'status' => $status,

@@ -2,6 +2,7 @@
 namespace App\Http\Services;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 
 class LocationService
 {
@@ -29,11 +30,12 @@ class LocationService
     public function isWithinRadius($userLat, $userLon, $user_id, $radius = 50): bool
     {
         $user = User::with('bidang.skpd')->find($user_id);
-        if (!$user || !$user->bidang->skpd->Latitude || !$user->bidang->skpd->Longitude) {
-            return false;
-        }
-        $targetLat = $user->bidang->skpd->Latitude;
-        $targetLon = $user->bidang->skpd->Longitude;
+        $skpdData = Cache::remember("skpd_loc_{$user->bidang->id_skpd}", 3600, function () use ($user) {
+            // Jika di Redis kosong, ambil dari DB (hanya running sekali)
+            return $user->bidang->skpd;
+        });
+        $targetLat = $skpdData->Latitude;
+        $targetLon = $skpdData->Longitude;
         return $this->getDistance($userLat, $userLon, $targetLat, $targetLon) <= $radius;
     }
 }

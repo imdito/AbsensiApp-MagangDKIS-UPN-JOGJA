@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Skpd;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class SkpdController extends Controller
 {
@@ -64,6 +65,8 @@ class SkpdController extends Controller
             'Longitude' => $request->input('longitude'),
             'Latitude' => $request->input('latitude'),
         ];
+
+        Cache::forget("skpd_loc_$skpd->id");
         $skpd->update($data);
 
         return redirect()->route('skpd.index')->with('success', 'Data SKPD diperbarui!');

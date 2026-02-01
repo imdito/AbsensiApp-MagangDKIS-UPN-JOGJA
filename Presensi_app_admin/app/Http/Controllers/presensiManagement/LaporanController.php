@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Bidang;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
-use App\Http\Services\StatistikServices; // Import Service
+use App\Http\Services\StatistikServices;
+use Illuminate\Support\Facades\Cache;
+
+// Import Service
 
 class LaporanController extends Controller
 {
@@ -20,7 +23,6 @@ class LaporanController extends Controller
     // Logic Mencetak PDF
     public function print(Request $request, StatistikServices $statistikService)
     {
-        // 1. Validasi
         $request->validate([
             'start_date' => 'nullable|date',
             'end_date'   => 'nullable|date|after_or_equal:start_date',
@@ -28,18 +30,20 @@ class LaporanController extends Controller
             'id_bidang'  => 'nullable|integer',
         ]);
 
-        // 2. Panggil Service untuk ambil data matang
-        $data = $statistikService->getLaporanData(
-            $request->nip,
-            $request->start_date,
-            $request->end_date,
-            $request->id_bidang
-        );
+        $cacheKey = 'laporan_' . md5(serialize($request->only(['start_date', 'end_date', 'nip', 'id_bidang'])));
 
-        // 3. Cetak PDF
+        $data = Cache::remember($cacheKey, 3600, function () use ($statistikService, $request) {
+            return $statistikService->getLaporanData(
+                $request->nip,
+                $request->start_date,
+                $request->end_date,
+                $request->id_bidang
+            );
+        });
+
         $pdf = Pdf::loadView('app.laporan.pdf', [
             'data' => $data,
-            'info' => $request->all() // Mengirim input filter untuk judul laporan
+            'info' => $request->all()
         ]);
 
         return $pdf->stream('laporan-karyawan.pdf');

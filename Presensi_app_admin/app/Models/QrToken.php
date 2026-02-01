@@ -21,13 +21,33 @@ class QrToken extends Model
     ];
 
     protected $dates = ['deleted_at'];
-    
+
 
     protected $fillable = [
         'token',
-        'Tipe_QR',
+        'id_skpd',
         'Tanggal',
         'Created_at',
         'Expired_at'
     ];
+
+    public function scopeTenanted($query)
+    {
+        $user = auth()->user();
+
+        // Super Admin melihat semuanya
+        if ($user->Jabatan === 'superadmin') {
+            return $query;
+        }
+
+        $skpdIdAdmin = $user->bidang->id_skpd ?? null;
+
+        if ($skpdIdAdmin) {
+            // Filter: Hanya tampilkan bidang yang skpd_id nya SAMA dengan skpd admin
+            return $query->where('id_skpd', $skpdIdAdmin);
+        }
+
+        // Kalau user error/gak punya data, kosongkan hasil
+        return $query->where('id', 0);
+    }
 }

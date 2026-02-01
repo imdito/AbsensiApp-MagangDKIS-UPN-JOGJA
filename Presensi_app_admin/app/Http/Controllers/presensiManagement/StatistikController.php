@@ -15,15 +15,11 @@ class StatistikController extends Controller
 {
     public function index()
     {
-        if(auth()->user()->Jabatan == 'superadmin'){
-            return redirect()->route('dashboard.super_admin');
-        }
-
         if(auth()->user()->Jabatan == 'Frontliner'){
             return redirect()->route('frontliner.index');
         }
 
-        if(auth()->user()->Jabatan !== 'admin'){
+        if(auth()->user()->Jabatan !== 'admin' && auth()->user()->Jabatan !== 'superadmin' ){
             return redirect('/mobile-only');
         }
 

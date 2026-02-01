@@ -23,6 +23,17 @@ class Skpd extends Model
     {
         return $this->hasMany(Bidang::class, 'id_skpd');
     }
+    // Model Skpd.php
+
+    public function users()
+    {
+        return $this->hasManyThrough(User::class, Bidang::class, 'id_skpd', 'id_bidang');
+    }
+
+    public function presensi()
+    {
+        return $this->hasManyThrough(Presensi::class, User::class, 'id_skpd', 'id_user');
+    }
 
 
 }

@@ -21,7 +21,7 @@
                             SESI AKTIF
                         </span>
                         <p class="text-[10px] text-red-500 font-bold uppercase tracking-widest">
-                            Kadaluarsa: {{ Carbon::parse($qrData->expired_at)->format('H:i') }} WIB
+                            Kadaluarsa: {{ Carbon::parse($qrData->Expired_at)->format('H:i') }} WIB
                         </p>
                     </div>
                 </div>
@@ -52,7 +52,7 @@
                         </button>
                     </div>
 
-                    <a href="{{ url('/dashboard') }}"
+                    <a href="{{ url('/') }}"
                        class="block text-xs font-bold text-gray-400 hover:text-blue-600 transition-colors uppercase tracking-widest mt-4">
                         &larr; Kembali ke Dashboard
                     </a>
@@ -81,7 +81,7 @@
                                class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
                             Batas Waktu Presensi (Tanggal & Jam)
                         </label>
-                        <input type="datetime-local" name="expired_at" id="expired_at" required
+                        <input type="time" name="expired_at" id="expired_at" required
                                class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-500 focus:ring-0 transition-all font-bold text-base text-gray-700"
                                value="{{ date('Y-m-d\TH:i', strtotime('+1 hour')) }}">
 
@@ -96,6 +96,10 @@
                             </p>
                         </div>
                     </div>
+
+                    @if(auth()->user()->Jabatan == 'superadmin')
+                        @include('layouts.qr_skpd_input_form')
+                    @endif
 
                     <button type="submit"
                             class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-100 transition-all transform hover:-translate-y-1 active:scale-95">

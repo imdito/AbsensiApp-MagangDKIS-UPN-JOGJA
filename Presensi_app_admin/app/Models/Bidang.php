@@ -47,8 +47,6 @@ class Bidang extends Model
             return $query;
         }
 
-        // 2. Admin Biasa: Cari tahu dia anak buah SKPD mana?
-        // Alur: User -> Bidang -> SKPD
         $skpdIdAdmin = $user->bidang->id_skpd ?? null;
 
         if ($skpdIdAdmin) {

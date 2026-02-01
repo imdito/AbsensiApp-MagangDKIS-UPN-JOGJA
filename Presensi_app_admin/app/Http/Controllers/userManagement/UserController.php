@@ -7,6 +7,7 @@ use App\Models\Bidang;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Mockery\Exception;
 
 class UserController extends Controller
 {
@@ -81,6 +82,36 @@ class UserController extends Controller
         User::where('user_id', $id)->update($data);
         return redirect('/karyawan')->with('sukses', 'Data berhasil diupdate');
 
+    }
+
+
+    public function updateApi(Request $request) {
+        // 1. Pastikan validasi menggunakan user_id yang benar
+        $request->validate([
+            'Nama_Pengguna' => 'required',
+            'email'         => 'required|email|unique:users,email,' . $request->user()->user_id . ',user_id',
+            'password'      => 'nullable|min:6',
+        ]);
+
+        try {
+            // 2. Cari user-nya
+            $user = User::findOrFail($request->user()->user_id);
+
+            // 3. Set data
+            $user->Nama_Pengguna = $request->Nama_Pengguna;
+            $user->email = $request->email;
+
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
+            }
+
+            // 4. Simpan
+            $user->save();
+
+            return response()->json(['message' => 'Data berhasil diupdate'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Gagal: ' . $e->getMessage()], 500);
+        }
     }
 
     public function destroy($id){

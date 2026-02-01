@@ -16,3 +16,6 @@ Route::post('/login', [LoginController::class, 'loginAPI'])->middleware('guest')
 Route::post('/presensiViaQR', [PresensiController::class, 'storeViaQR'])->middleware('auth:sanctum');
 
 Route::get('/presensi/riwayat/{user_id}', [StatistikController::class, 'riwayatPresensi'])->middleware('auth:sanctum');
+
+Route::put('/users/update', [UserController::class, 'updateApi'])->middleware('auth:sanctum');
+

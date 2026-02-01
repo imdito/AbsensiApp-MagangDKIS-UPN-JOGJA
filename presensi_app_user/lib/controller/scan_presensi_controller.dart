@@ -97,10 +97,10 @@ class ScanPresensiController extends GetxController {
         notifPresensi(context, message.value, true);
         Get.back();
       } else if(response.statusCode == 500){
+        print("response Body: ${response.body}");
         throw data['message'];
       }else {
-
-        print("Response Body: ${response.body}");
+        print("response Body: ${response.body}");
         throw "Gagal Presensi: ${data['message'] ?? 'Unknown error'}";
       }
 

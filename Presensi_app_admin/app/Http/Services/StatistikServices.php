@@ -3,75 +3,109 @@
 namespace App\Http\Services;
 
 use App\Enums\Enums;
+use App\Models\QrToken;
 use App\Models\User;
 use App\Models\Presensi;
 use Carbon\CarbonPeriod;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class StatistikServices{
     public function getLaporanData(?string $nip, ?string $startDate, ?string $endDate, ?string $idBidang): Collection
     {
-        // 1. Cek User jika NIP diisi
-        $user = null;
+        // 1. AMBIL USER TARGET
+        $userQuery = User::query()->tenanted(); // Pastikan scope tenant aktif
+
         if ($nip) {
-            $user = User::tenanted()->where('NIP', $nip)->first();
-
-            // Jika NIP diisi tapi User tidak ketemu, kembalikan collection kosong
-            if (!$user) {
-                return collect([]);
-            }
+            $userQuery->where('NIP', $nip);
+        } elseif ($idBidang) {
+            $userQuery->where('id_bidang', $idBidang);
         }
 
-        // 2. Base Query
-        $query = Presensi::query()->tenanted();
+        // Ambil data user + relasi bidang (untuk kop laporan)
+        $users = $userQuery->with('bidang')->orderBy('Nama_Pengguna')->get();
 
-        if ($user) {
-            $query->where('user_id', $user->user_id);
-        }elseif ($idBidang) {
-            $query->whereHas('user', function($q) use ($idBidang) {
-                $q->where('id_bidang', $idBidang);
-            });
+        if ($users->isEmpty()) {
+            return collect([]);
         }
 
-        // 3. Filter Tanggal Query
+        // 2. AMBIL TANGGAL "APEL" SAJA (Berdasarkan Tabel QR)
+        // Kita tidak pakai CarbonPeriod lagi, tapi pakai data real dari DB QR
+        $qrQuery = \App\Models\QrToken::query(); // Tambahkan ->tenanted() jika QR juga per-tenant
+
+        // Filter tanggal QR sesuai request
         if ($startDate && $endDate) {
-            $query->whereBetween('tanggal', [$startDate, $endDate]);
+            $qrQuery->whereBetween('Tanggal', [$startDate, $endDate]);
         } elseif ($startDate) {
-            $query->where('tanggal', '>=', $startDate);
+            $qrQuery->where('Tanggal', '>=', $startDate);
         }
 
-        // 4. Logic Data (Looping CarbonPeriod)
-        if ($user && $startDate && $endDate) {
+        // Jika user difilter per bidang, pastikan QR yang diambil adalah QR milik SKPD user tersebut
+        // Agar tidak memunculkan tanggal Apel milik dinas lain (jika database gabungan)
+        $firstUser = $users->first();
+        if ($firstUser && $firstUser->bidang) {
+            $qrQuery->where('id_skpd', $firstUser->bidang->id_skpd);
+        }
 
-            $dbData = $query->get()->keyBy(function($item) {
-                return $item->tanggal; // Pastikan format di DB Y-m-d, atau gunakan carbon format
-            });
+        // Ambil List Tanggal Unik dimana Apel dilaksanakan
+        // Format tanggal disamakan dengan database (Y-m-d)
+        $activeQrDates = $qrQuery->tenanted()->orderBy('Tanggal')
+            ->pluck('Tanggal') // Ambil kolom tanggal saja
+            ->map(fn($tgl) => \Carbon\Carbon::parse($tgl)->format('Y-m-d'))
+            ->unique()
+            ->values()
+            ->toArray();
 
-            $period = CarbonPeriod::create($startDate, $endDate);
-            $finalData = collect();
+        // Jika tidak ada QR sama sekali dalam periode ini, return kosong
+        if (empty($activeQrDates)) {
+            return collect([]);
+        }
 
-            foreach ($period as $date) {
-                $dateStr = $date->format('Y-m-d');
+        // 3. AMBIL DATA PRESENSI USER (Hanya di tanggal-tanggal Apel)
+        $presensiData = Presensi::whereIn('user_id', $users->pluck('user_id'))
+            ->whereIn('tanggal', $activeQrDates)
+            ->tenanted()
+            ->get()
+            ->groupBy('user_id');
 
-                if ($dbData->has($dateStr)) {
-                    $finalData->push($dbData[$dateStr]);
+        // 4. GENERATE LAPORAN (Matrix: User x Tanggal QR)
+        $finalReport = collect();
+
+        foreach ($users as $user) {
+
+            $userPresensi = $presensiData->get($user->user_id, collect());
+
+            // KITA LOOPING BERDASARKAN TANGGAL QR YANG ADA SAJA
+            foreach ($activeQrDates as $dateStr) {
+
+                // Cek apakah user absen di tanggal apel ini?
+                $dataHadir = $userPresensi->firstWhere('tanggal', $dateStr);
+
+                if ($dataHadir) {
+                    // KASUS 1: HADIR (Datanya ada di tabel presensi)
+                    $finalReport->push($dataHadir);
                 } else {
-                    // Jika data tidak ada (Bolong), buat Dummy Object
-                    $dummy = new Presensi();
-                    $dummy->user = $user; // Attach object user
-                    $dummy->tanggal = $dateStr;
-                    $dummy->status = Enums::TidakHadir;
-                    $dummy->jam_masuk = '-';
+                    // KASUS 2: TIDAK HADIR (Hari itu ada Apel/QR, tapi user tidak absen)
+                    // Kita buat Dummy Object untuk menandakan Alpa
 
-                    $finalData->push($dummy);
+                    $dummy = new Presensi();
+                    $dummy->user_id = $user->user_id;
+                    $dummy->user    = $user; // Attach relasi manual
+                    $dummy->tanggal = $dateStr;
+                    $dummy->jam_masuk = '-';
+                    $dummy->status    = 'Tidak Hadir'; // Vonis langsung karena QR-nya ada
+
+                    $finalReport->push($dummy);
                 }
             }
-
-            return $finalData;
-
-        } else {
-            return $query->with('user')->get();
         }
+
+        // 5. Sorting Laporan
+        // Opsi: Urutkan berdasarkan Tanggal dulu, baru Nama User
+        return $finalReport->sortBy([
+            ['tanggal', 'asc'],
+            ['user.Nama_Pengguna', 'asc']
+        ]);
     }
 
 

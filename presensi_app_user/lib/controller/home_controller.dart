@@ -1,10 +1,12 @@
 import 'package:get/get.dart';
 import 'package:presensi_app_user/model/user_model.dart';
+import 'package:presensi_app_user/view/edit_user_view.dart';
 import 'package:presensi_app_user/view/scan_presensi_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/biometrik_auth.dart';
 import '../view/auth/login_page.dart';
+import '../view/faceRecognition/face_recognition_view.dart';
 import '../view/riwayat_view.dart';
 
 class HomeController extends GetxController {
@@ -42,7 +44,7 @@ class HomeController extends GetxController {
 
   void goToEditProfile() {
     print("Navigasi ke Edit Profile");
-    // Get.to(() => EditProfilePage());
+    Get.to(() => EditUserView(user: user));
   }
 
   void logout() {

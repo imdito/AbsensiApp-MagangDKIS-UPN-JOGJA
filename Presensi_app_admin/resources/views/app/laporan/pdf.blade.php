@@ -1,140 +1,253 @@
-<!DOCTYPE html>
+@php use Carbon\Carbon; @endphp
+    <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Data Karyawan</title>
+    <title>Laporan Kehadiran - {{ now()->format('dmY') }}</title>
     <style>
-        /* SETUP KERTAS & MARGIN */
-        @page { margin: 1cm 0.5cm; }
-        body { font-family: "Times New Roman", Times, serif; margin: 0; padding: 0; }
+        /* 1. SETUP KERTAS A4 PORTRAIT */
+        @page {
+            size: A4;
+            margin: 2cm 2cm 2cm 2cm; /* Margin standar surat resmi */
+        }
 
-        /* KOP SURAT */
-        .kop-header { width: 100%; border-collapse: collapse; margin-bottom: 5px; table-layout: fixed; }
-        .kop-logo-cell { width: 15%; text-align: center; vertical-align: middle; }
-        .kop-text-cell { width: 85%; text-align: center; vertical-align: middle; padding-right: 15px; }
-        .pemkot-name { font-size: 14pt; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
-        .instansi-name { font-size: 16pt; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; }
-        .alamat-text { font-size: 10pt; margin-bottom: 2px; }
-        .kontak-text { font-size: 9pt; }
-        .garis-pemisah { border-top: 3px solid black; height: 2px; border-bottom: 1px solid black; margin-bottom: 15px; }
+        body {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 11pt; /* Ukuran font standar surat */
+            line-height: 1.3;
+            color: #000;
+        }
 
-        /* TABEL DATA PRESENSI */
-        .table-data { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .table-data th, .table-data td { border: 1px solid black; padding: 4px 6px; font-size: 10pt; vertical-align: middle; }
-        .table-data th { background-color: #f0f0f0; text-align: center; font-weight: bold; text-transform: uppercase; }
-        .table-data tr:nth-child(even) { background-color: #f9f9f9; }
+        /* 2. KOP SURAT */
+        .kop-table {
+            width: 100%;
+            border-bottom: 5px double #000; /* Garis ganda tebal tipis */
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
 
-        /* TABEL IDENTITAS (KHUSUS FILTER NIP) */
-        .table-identitas { width: 100%; border-collapse: collapse; font-size: 11pt; margin-bottom: 10px; }
-        .table-identitas td { border: none; padding: 2px; vertical-align: top; }
-        .label { font-weight: bold; width: 15%; }
-        .separator { width: 2%; text-align: center; }
+        .kop-logo {
+            width: 15%;
+            text-align: center;
+            vertical-align: middle;
+        }
 
-        /* LEBAR KOLOM TABEL DATA */
-        .col-no { width: 5%; }
-        .col-nip { width: 18%; }
-        .col-nama { width: 22%; }
-        .col-bidang { width: 30%; }
-        .col-tgl { width: 15%; }
-        .col-ket { width: 10%; }
+        .kop-text {
+            width: 85%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .pemkot {
+            font-size: 14pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .dinas {
+            font-size: 18pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 5px 0;
+        }
+
+        .alamat {
+            font-size: 10pt;
+            font-style: italic;
+        }
+
+        /* 3. JUDUL & IDENTITAS */
+        .judul-laporan {
+            text-align: center;
+            font-size: 12pt;
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .periode {
+            text-align: center;
+            font-size: 11pt;
+            margin-bottom: 20px;
+        }
+
+        /* Tabel Identitas (Untuk Filter NIP) */
+        .info-table {
+            width: 100%;
+            margin-bottom: 15px;
+            font-size: 11pt;
+        }
+
+        .info-table td {
+            vertical-align: top;
+            padding: 2px 0;
+        }
+
+        .info-label {
+            width: 15%;
+            font-weight: bold;
+        }
+
+        .info-sep {
+            width: 2%;
+            text-align: center;
+        }
+
+        .info-val {
+            width: 83%;
+        }
+
+        /* 4. TABEL DATA PRESENSI */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10pt;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid #000;
+            padding: 6px 8px;
+            vertical-align: middle;
+        }
+
+        .data-table th {
+            background-color: #e0e0e0; /* Abu-abu muda untuk header */
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Zebra Striping (Opsional, agar mudah dibaca) */
+        .data-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* Status Badges (Text Only untuk PDF Resmi) */
+        .status-hadir {
+            color: #000;
+        }
+
+        /* Tetap hitam formal */
+        .status-absen {
+            color: #d32f2f;
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        /* Merah untuk absen */
+        .status-libur {
+            color: #f57c00;
+            font-style: italic;
+        }
+
+        /* Oranye untuk libur */
+
+        /* 5. TANDA TANGAN */
+        .signature-container {
+            margin-top: 40px;
+            width: 100%;
+            page-break-inside: avoid; /* Jangan terpotong halaman */
+        }
+
+        .ttd-box {
+            float: right;
+            width: 40%;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
-{{-- 1. KOP SURAT --}}
-<table class="kop-header">
+{{-- KOP SURAT --}}
+<table class="kop-table">
     <tr>
-        <td class="kop-logo-cell">
-            {{-- Pastikan path logo benar --}}
-            <img src="{{ public_path('logo-pemkot.png') }}" width="90" height="auto" alt="Logo">
+        <td class="kop-logo">
+            {{-- Gunakan public_path agar terbaca oleh DOMPDF --}}
+            <img src="{{ public_path('logo-pemkot.png') }}" width="80" alt="Logo">
         </td>
-        <td class="kop-text-cell">
-            <div class="pemkot-name">PEMERINTAH KOTA CIREBON</div>
-            <div class="instansi-name">DINAS KOMUNIKASI, INFORMATIKA DAN STATISTIK</div>
-            <div class="alamat-text">Jalan Dr. Sudarsono No. 40, Cirebon 45134 Telepon (0231) 8804620, 209324</div>
-            <div class="kontak-text">Email dkis@cirebonkota.go.id Website dkis.cirebonkota.go.id</div>
+        <td class="kop-text">
+            <div class="pemkot">Pemerintah Kota Cirebon</div>
+            <div class="dinas">{{$skpd->nama}}</div>
+            <div class="alamat">
+                {{$skpd->Alamat}} <br>
+                Telepon (0231) 8804620, Email: dkis@cirebonkota.go.id
+            </div>
         </td>
     </tr>
 </table>
-<div class="garis-pemisah"></div>
 
-{{-- 2. JUDUL & FILTER INFO --}}
-<div style="margin-bottom: 20px;">
-    <h3 style="text-align: center; text-decoration: underline; margin-bottom: 15px; margin-top: 0;">
-        LAPORAN KEHADIRAN APEL PAGI
-    </h3>
+{{-- JUDUL LAPORAN --}}
+<div class="judul-laporan">Laporan Data Kehadiran Apel Pagi</div>
 
-    {{-- LOGIC: Jika Filter NIP (Perorangan) --}}
-    @if(isset($info['nip']) && $info['nip'])
-        @php
-            // Ambil data user dari row pertama (jika ada data) untuk menampilkan Nama & Bidang
-            $firstUser = $data->first()->user ?? null;
-            $namaUser  = $firstUser->Nama_Pengguna ?? '-';
-            $namaBidang= $firstUser->bidang->nama_bidang ?? '-';
-        @endphp
-
-        {{-- Tabel Identitas Diri --}}
-        <table class="table-identitas">
-            <tr>
-                <td class="label">NAMA</td>
-                <td class="separator">:</td>
-                <td>{{ $namaUser }}</td>
-            </tr>
-            <tr>
-                <td class="label">NIP</td>
-                <td class="separator">:</td>
-                <td>{{ $info['nip'] }}</td>
-            </tr>
-            <tr>
-                <td class="label">BIDANG</td>
-                <td class="separator">:</td>
-                <td>{{ $namaBidang }}</td>
-            </tr>
-        </table>
-
-        {{-- LOGIC: Jika Filter Bidang (Per Divisi) --}}
-    @elseif(isset($info['id_bidang']) && $info['id_bidang'])
-        @php
-            // Ambil nama bidang dari row pertama
-            $namaBidang = $data->first()->user->bidang->nama_bidang ?? 'Data Bidang Kosong';
-        @endphp
-
-        {{-- Judul Bidang Tengah --}}
-        <div style="text-align: center; font-size: 12pt; font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">
-            BIDANG: {{ $namaBidang }}
-        </div>
-
-    @endif
-
-    {{-- Tanggal Periode (Selalu Muncul) --}}
+<div class="periode">
     @if(isset($info['start_date']) && isset($info['end_date']))
-        <div style="{{ isset($info['nip']) ? 'text-align: left; margin-top: 5px;' : 'text-align: center;' }} font-size: 11pt;">
-            <span style="{{ isset($info['nip']) ? 'font-weight: bold; display: inline-block; width: 15%;' : '' }}">Periode</span>
-            <span style="{{ isset($info['nip']) ? 'display: inline-block; width: 2%; text-align: center;' : '' }}">{{ isset($info['nip']) ? ':' : '' }}</span>
-            {{ \Carbon\Carbon::parse($info['start_date'])->translatedFormat('d F Y') }}
-            s/d
-            {{ \Carbon\Carbon::parse($info['end_date'])->translatedFormat('d F Y') }}
-        </div>
+        Periode: {{ Carbon::parse($info['start_date'])->translatedFormat('d F Y') }}
+        s/d {{ Carbon::parse($info['end_date'])->translatedFormat('d F Y') }}
+    @else
+        Periode: Semua Data
     @endif
 </div>
 
-{{-- 3. TABEL DATA UTAMA --}}
-<table class="table-data">
+{{-- LOGIC IDENTITAS: Jika Filter NIP (Perorangan) --}}
+@if(isset($info['nip']) && $info['nip'])
+    @php
+        // Mengambil data user dari item pertama (karena user sama semua)
+        // Menggunakan optional() untuk menghindari error jika data kosong
+        $sampleItem = $data->first();
+        $userNama = $sampleItem->user->Nama_Pengguna ?? 'Data Tidak Ditemukan';
+        $userNip  = $sampleItem->user->NIP ?? $info['nip'];
+        $userBidang = $sampleItem->user->bidang->nama_bidang ?? '-';
+    @endphp
+    <table class="info-table">
+        <tr>
+            <td class="info-label">Nama Pegawai</td>
+            <td class="info-sep">:</td>
+            <td class="info-val">{{ $userNama }}</td>
+        </tr>
+        <tr>
+            <td class="info-label">NIP</td>
+            <td class="info-sep">:</td>
+            <td class="info-val">{{ $userNip }}</td>
+        </tr>
+        <tr>
+            <td class="info-label">Unit Kerja</td>
+            <td class="info-sep">:</td>
+            <td class="info-val">{{ $userBidang }}</td>
+        </tr>
+    </table>
+
+    {{-- LOGIC IDENTITAS: Jika Filter Bidang (Satu Divisi) --}}
+@elseif(isset($info['id_bidang']) && $info['id_bidang'])
+    @php
+        $namaBidang = $data->first()->user->bidang->nama_bidang ?? 'Bidang Tidak Diketahui';
+    @endphp
+    <div style="text-align: center; margin-bottom: 15px; font-weight: bold; text-transform: uppercase;">
+        UNIT KERJA: {{ $namaBidang }}
+    </div>
+@endif
+
+{{-- TABEL DATA --}}
+<table class="data-table">
     <thead>
     <tr>
-        <th class="col-no">No</th>
+        <th style="width: 5%">No</th>
 
-        {{-- Jika Filter NIP, kolom NIP dan Nama sebenarnya redundan, tapi opsional bisa disembunyikan --}}
-        <th class="col-nip">NIP</th>
-        <th class="col-nama">Nama</th>
-
-        {{-- Sembunyikan kolom Bidang jika sudah filter Bidang/NIP agar tabel lebih lega (Opsional) --}}
-        @if(!isset($info['id_bidang']) && !isset($info['nip']))
-            <th class="col-bidang">Bidang</th>
+        {{-- Sembunyikan NIP/Nama jika Laporan Perorangan --}}
+        @if(!isset($info['nip']))
+            <th style="width: 20%">NIP</th>
+            <th style="width: 25%">Nama Pegawai</th>
         @endif
 
-        <th class="col-tgl">Tanggal</th>
-        <th class="col-ket">Ket</th>
+        {{-- Sembunyikan Bidang jika Filter Bidang atau NIP --}}
+        @if(!isset($info['id_bidang']) && !isset($info['nip']))
+            <th style="width: 20%">Bidang</th>
+        @endif
+
+        <th style="width: 20%">Tanggal</th>
+        <th style="width: 15%">Jam Masuk</th>
+        <th style="width: 15%">Status</th>
     </tr>
     </thead>
     <tbody>
@@ -142,39 +255,65 @@
         <tr>
             <td style="text-align: center;">{{ $index + 1 }}</td>
 
-            <td style="text-align: center;">{{ $item->user->NIP }}</td>
-            <td>{{ $item->user->Nama_Pengguna ?? '-' }}</td>
+            @if(!isset($info['nip']))
+                <td style="text-align: center;">{{ $item->user->NIP ?? '-' }}</td>
+                <td>{{ $item->user->Nama_Pengguna ?? '-' }}</td>
+            @endif
 
             @if(!isset($info['id_bidang']) && !isset($info['nip']))
-                <td style="text-align: center">{{ $item->user->bidang->nama_bidang ?? '-' }}</td>
+                <td style="text-align: center; font-size: 9pt;">
+                    {{ $item->user->bidang->nama_bidang ?? '-' }}
+                </td>
             @endif
 
             <td style="text-align: center;">
-                {{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('d F Y') }}
+                {{ Carbon::parse($item->tanggal)->translatedFormat('d F Y') }}
             </td>
 
-            {{-- Pewarnaan Status Sederhana --}}
-            <td style="text-align: center; font-weight: bold;">
-                {{ $item->status }}
+            <td style="text-align: center;">
+                {{ $item->jam_masuk ?? '-' }}
+            </td>
+
+            {{-- Logic Pewarnaan Status --}}
+            <td style="text-align: center;">
+                @php
+                    $status = $item->status; // Bisa berupa string atau Enum
+                    $statusText = is_object($status) ? $status->value : $status;
+
+                    $class = 'status-hadir';
+                    if (stripos($statusText, 'tidak hadir') !== false || stripos($statusText, 'alpa') !== false) {
+                        $class = 'status-absen';
+                    } elseif (stripos($statusText, 'libur') !== false) {
+                        $class = 'status-libur';
+                    }
+                @endphp
+                <span class="{{ $class }}">
+                            {{ $statusText }}
+                        </span>
             </td>
         </tr>
     @empty
         <tr>
-            {{-- Colspan menyesuaikan jumlah kolom yang tampil --}}
-            <td colspan="{{ (!isset($info['id_bidang']) && !isset($info['nip'])) ? 6 : 5 }}"
-                style="text-align: center; font-style: italic; padding: 20px;">
-                Data presensi tidak ditemukan pada periode ini.
+            <td colspan="6" style="text-align: center; padding: 20px; font-style: italic;">
+                Tidak ada data presensi untuk periode ini.
             </td>
         </tr>
     @endforelse
     </tbody>
 </table>
 
-{{-- Tanda Tangan (Opsional) --}}
-<div style="margin-top: 50px; float: right; width: 200px; text-align: center;">
-    <p>Cirebon, {{ now()->translatedFormat('d F Y') }}</p>
-    <br><br><br>
-    <p><strong>Administrator</strong></p>
+{{-- TANDA TANGAN --}}
+<div class="signature-container">
+    <div class="ttd-box">
+        <p>Cirebon, {{ now()->translatedFormat('d F Y') }}</p>
+        <p>Mengetahui,</p>
+        <p style="margin-bottom: 60px;"><strong>Kepala Bidang / Admin</strong></p>
+
+        <p style="text-decoration: underline; font-weight: bold;">
+            ( ........................................... )
+        </p>
+        <p>NIP. ...........................</p>
+    </div>
 </div>
 
 </body>

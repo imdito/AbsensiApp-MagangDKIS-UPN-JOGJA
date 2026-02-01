@@ -7,4 +7,6 @@ enum Enums: string {
     case Izin = 'Izin';
     case Telat = 'Telat';
     case TidakHadir = 'Tidak Hadir';
+
+    case Libur = 'Libur';
 }

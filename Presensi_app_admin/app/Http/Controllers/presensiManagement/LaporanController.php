@@ -4,6 +4,7 @@ namespace App\Http\Controllers\presensiManagement;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bidang;
+use App\Models\Skpd;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Http\Services\StatistikServices;
@@ -41,9 +42,15 @@ class LaporanController extends Controller
             );
         });
 
+        $skpd = skpd::where('id', auth()->user()->bidang->id_skpd)->first();
+        if(!$skpd){
+            $skpd->nama = "Kota Cirebon";
+            $skpd->alamat = "Jawa Barat, Kota Cirebon";
+        }
         $pdf = Pdf::loadView('app.laporan.pdf', [
             'data' => $data,
-            'info' => $request->all()
+            'info' => $request->all(),
+            'skpd' => $skpd,
         ]);
 
         return $pdf->stream('laporan-karyawan.pdf');

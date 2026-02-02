@@ -52,7 +52,7 @@
 
                 <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
                     <div>
-                        <label for="NIP" class="block text-sm font-medium text-gray-700">NIP (Nomor Induk)</label>
+                        <label for="NIP" class="block text-sm font-medium text-gray-700">NIP (Nomor Induk) / NIK</label>
                         <div class="mt-1">
                             <input type="number" name="NIP" id="NIP" value="{{ old('NIP') }}" required placeholder="12345678"
                                    class="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">

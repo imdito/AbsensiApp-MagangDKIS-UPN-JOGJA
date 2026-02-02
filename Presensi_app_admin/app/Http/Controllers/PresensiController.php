@@ -14,7 +14,7 @@ class PresensiController extends Controller{
 
     public function create(){
         $users = User::lazy();
-        $daftar_qr = QrToken::orderBy('Created_at', 'desc')->lazy();
+        $daftar_qr = QrToken::tenanted()->orderBy('Created_at', 'desc')->lazy();
         return $this->viewWithLayout('app.create', compact('users', 'daftar_qr'));
     }
 

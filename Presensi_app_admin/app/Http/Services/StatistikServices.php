@@ -14,7 +14,7 @@ class StatistikServices{
     public function getLaporanData(?string $nip, ?string $startDate, ?string $endDate, ?string $idBidang): Collection
     {
         // 1. AMBIL USER TARGET
-        $userQuery = User::query()->tenanted(); // Pastikan scope tenant aktif
+        $userQuery = User::query()->tenanted();
 
         if ($nip) {
             $userQuery->where('NIP', $nip);
@@ -29,9 +29,7 @@ class StatistikServices{
             return collect([]);
         }
 
-        // 2. AMBIL TANGGAL "APEL" SAJA (Berdasarkan Tabel QR)
-        // Kita tidak pakai CarbonPeriod lagi, tapi pakai data real dari DB QR
-        $qrQuery = \App\Models\QrToken::query(); // Tambahkan ->tenanted() jika QR juga per-tenant
+        $qrQuery = QrToken::query();
 
         // Filter tanggal QR sesuai request
         if ($startDate && $endDate) {
@@ -40,15 +38,11 @@ class StatistikServices{
             $qrQuery->where('Tanggal', '>=', $startDate);
         }
 
-        // Jika user difilter per bidang, pastikan QR yang diambil adalah QR milik SKPD user tersebut
-        // Agar tidak memunculkan tanggal Apel milik dinas lain (jika database gabungan)
         $firstUser = $users->first();
         if ($firstUser && $firstUser->bidang) {
             $qrQuery->where('id_skpd', $firstUser->bidang->id_skpd);
         }
 
-        // Ambil List Tanggal Unik dimana Apel dilaksanakan
-        // Format tanggal disamakan dengan database (Y-m-d)
         $activeQrDates = $qrQuery->tenanted()->orderBy('Tanggal')
             ->pluck('Tanggal') // Ambil kolom tanggal saja
             ->map(fn($tgl) => \Carbon\Carbon::parse($tgl)->format('Y-m-d'))
@@ -68,7 +62,7 @@ class StatistikServices{
             ->get()
             ->groupBy('user_id');
 
-        // 4. GENERATE LAPORAN (Matrix: User x Tanggal QR)
+        // 4. GENERATE LAPORAN
         $finalReport = collect();
 
         foreach ($users as $user) {

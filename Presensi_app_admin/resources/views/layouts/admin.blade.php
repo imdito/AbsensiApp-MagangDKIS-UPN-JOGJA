@@ -21,8 +21,8 @@
 
     <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
         <div class="h-16 flex items-center px-8 border-b border-gray-100">
-            <i class="fa-solid fa-cube text-indigo-600 text-xl mr-3"></i>
-            <span class="text-lg font-bold tracking-tight text-gray-900">E-Presensi</span>
+            <img src="{{asset('logo-pemkot.png')}}" alt="Logo" class="h-8 w-8 mr-3">
+            <span class="text-lg font-bold tracking-tight text-gray-900">Sistem Presensi Apel Pagi </span>
         </div>
 
         @php

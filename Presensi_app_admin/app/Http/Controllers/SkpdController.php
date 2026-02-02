@@ -25,7 +25,8 @@ class SkpdController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_skpd' => 'required|unique:skpds,nama_skpd|max:255',
+            'nama_skpd' => 'required|unique:skpd,nama|max:255',
+            'kode' => 'required|unique:skpd,kode|max:20',
             'alamat'    => 'required|string',
             'longitude'  => 'required',
             'latitude'   => 'required',
@@ -34,6 +35,7 @@ class SkpdController extends Controller
         $data = [
             'nama' => $request->input('nama_skpd'),
             'alamat' => $request->input('alamat'),
+            'kode' => $request->input('kode'),
             'Longitude' => $request->input('longitude'),
             'Latitude' => $request->input('latitude'),
         ];
